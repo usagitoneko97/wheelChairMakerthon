@@ -1,0 +1,178 @@
+{
+"views":[{
+  "views" :[],
+  "properties" :[{
+    "value":"wrap_content",
+    "type":"dimen",
+    "name":"layout_width"
+  },
+  {
+    "value":"wrap_content",
+    "type":"dimen",
+    "name":"layout_height"
+  },
+  {
+  "value":"true",
+  "type":"BOOLEAN",
+  "name":"layout_alignParentLeft"
+  },
+  {
+  "value":"true",
+  "type":"BOOLEAN",
+  "name":"layout_alignParentStart"
+  },
+  {
+  "value":"true",
+  "type":"BOOLEAN",
+  "name":"layout_alignParentTop"
+  },
+  {
+  "value":"30dp",
+  "type":"dimen",
+  "name":"layout_marginTop"
+  },
+  {
+  "value":"Led2",
+  "type":"String",
+  "name":"id"
+  },
+  {
+  "value":"Led2",
+  "type":"ref",
+  "name":"id"
+  }],
+  "widget":"Switch"
+
+},
+{
+"views" :[],
+"properties" :[{
+  "value":"wrap_content",
+  "type":"dimen",
+  "name":"layout_width"
+},
+{
+  "value":"wrap_content",
+  "type":"dimen",
+  "name":"layout_height"
+},
+{
+"value":"true",
+"type":"BOOLEAN",
+"name":"layout_alignParentLeft"
+},
+{
+"value":"true",
+"type":"BOOLEAN",
+"name":"layout_alignParentStart"
+},
+{
+"value":"Green Led",
+"type":"String",
+"name":"id"
+},
+{
+"value":"ledGreen",
+"type":"ref",
+"name":"id"
+},
+{
+"value":"led2",
+"type":"ref",
+"name":"layout_below"
+}],
+"widget":"Switch"
+},
+{
+"views" :[],
+"properties" :[{
+  "value":"wrap_content",
+  "type":"dimen",
+  "name":"layout_width"
+},
+{
+  "value":"wrap_content",
+  "type":"dimen",
+  "name":"layout_height"
+},
+{
+"value":"true",
+"type":"BOOLEAN",
+"name":"layout_alignParentLeft"
+},
+{
+"value":"true",
+"type":"BOOLEAN",
+"name":"layout_alignParentStart"
+},
+{
+"value":"Blue Led",
+"type":"String",
+"name":"id"
+},
+{
+"value":"ledBlue",
+"type":"ref",
+"name":"id"
+},
+{
+"value":"ledGreen",
+"type":"ref",
+"name":"layout_below"
+}],
+"widget":"Switch"
+},
+{
+"views" :[],
+"properties" :[{
+  "value":"wrap_content",
+  "type":"dimen",
+  "name":"layout_width"
+},
+{
+  "value":"wrap_content",
+  "type":"dimen",
+  "name":"layout_height"
+},
+{
+"value":"true",
+"type":"BOOLEAN",
+"name":"layout_alignParentLeft"
+},
+{
+"value":"true",
+"type":"BOOLEAN",
+"name":"layout_alignParentStart"
+},
+{
+"value":"Orange Led",
+"type":"String",
+"name":"id"
+},
+{
+"value":"ledOrange",
+"type":"ref",
+"name":"id"
+},
+{
+"value":"ledBlue",
+"type":"ref",
+"name":"layout_below"
+}],
+"widget":"Switch"
+}],
+
+
+"properties" :[{
+"value":"wrap_content",
+"type":"dimen",
+"name":"layout_width"
+},
+{
+"value":"wrap_content",
+"type":"dimen",
+"name":"layout_height"
+}],
+ "widget": "RelativeLayout"
+}
+  
