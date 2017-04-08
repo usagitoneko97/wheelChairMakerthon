@@ -93,9 +93,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.wheel_chair);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
-        toolbar.setTitleTextColor(Color.WHITE);
-        setSupportActionBar(toolbar);
+
         password = (PwdInputView)findViewById(R.id.password);
 
 

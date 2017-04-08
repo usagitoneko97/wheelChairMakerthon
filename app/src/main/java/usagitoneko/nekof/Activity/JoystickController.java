@@ -1,9 +1,14 @@
 package usagitoneko.nekof.Activity;
 
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -44,7 +49,12 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.joystick_controller);
+        setContentView(R.layout.joystick_wrapper);
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.joystickToolbar);
+        setSupportActionBar(myToolbar);
+        /*Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        toolbar.setTitleTextColor(Color.WHITE);
+        setSupportActionBar(toolbar);*/
         lineIndicator = findViewById(R.id.lineIndicator);
         /*Bundle data = getIntent().getExtras();
         String s = data.getString("NAME");
@@ -81,13 +91,23 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
             @Override
             public void onDrag(float degrees, float offset) {
                 // ..
+                float finalDegrees;
                 lineIndicator.getLocationOnScreen(location);
                 lineIndicator.setRotation(360-degrees);
                 lineIndicator.setLayoutParams(new ConstraintLayout.LayoutParams( Math.round(offset*556),11));
                 lineIndicator.setX(701);
                 lineIndicator.setY(726);
                 croller.setProgress(Math.round(offset*100));
+                if(degrees>0){
+                    finalDegrees = (360-(degrees+180))+180;
+
+                }
+                else {
+                    finalDegrees = degrees*-1;
+                }
+
                 sendCommand("body",offset, degrees);
+                Log.v("angle", String.valueOf(finalDegrees));
             }
 
             @Override
@@ -121,11 +141,36 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
         return croller;
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            // TODO: 4/8/2017 go to settings activity
+            Intent settingsIntent = new Intent(this, SettingsActivity.class);
+            startActivity(settingsIntent);
+
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
     private boolean sendCommand (final String operation, final float offset, final float degrees){
         // TODO: 3/28/2017 send degrees and offset as json object
 
         StringBuilder uRLBuilder = new StringBuilder();
-        uRLBuilder.append("http://192.168.4.1/");
+        uRLBuilder.append("http://192.168.178.87/");
         uRLBuilder.append(operation);
         String URL = uRLBuilder.toString();
             JsonObjectRequest jsObjRequest = new JsonObjectRequest

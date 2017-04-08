@@ -11,6 +11,7 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
+        vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {
@@ -27,9 +28,13 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+    compile files('src/main/java/usagitoneko/nekof/GenAsync.jar')
+    compile files('src/main/java/usagitoneko/nekof/gson-2.8.0-sources.jar')
+    compile files('src/main/java/usagitoneko/nekof/KGJsonConverter.jar')
+    compile group: 'cz.msebera.android', name: 'httpclient', version: '4.4.1.1'
+
     compile 'com.android.support:appcompat-v7:25.1.1'
     compile 'com.android.support:support-v4:25.1.1'
-    testCompile 'junit:junit:4.12'
     compile 'com.android.support:design:25.1.1'
     compile 'me.spark:submitbutton:1.0.1'
     compile 'com.github.dmytrodanylyk.android-process-button:library:1.0.0'
@@ -38,14 +43,11 @@ dependencies {
     compile 'com.afollestad.material-dialogs:core:0.9.3.0'
     compile 'com.tuyenmonkey:mkloader:1.0.0'
     compile 'info.hoang8f:fbutton:1.0.5'
-    compile files('src/main/java/usagitoneko/nekof/GenAsync.jar')
-    compile files('src/main/java/usagitoneko/nekof/gson-2.8.0-sources.jar')
-    compile files('src/main/java/usagitoneko/nekof/KGJsonConverter.jar')
-    compile group: 'cz.msebera.android' , name: 'httpclient', version: '4.4.1.1'
     compile 'com.github.medyo:fancybuttons:1.8.3'
     compile 'com.android.volley:volley:1.0.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.1'
     compile 'com.jmedeisis:bugstick:0.2.2'
     compile 'com.github.bassaer:materialdesigncolors:1.0.0'
-
+    compile 'com.android.support:support-vector-drawable:25.2.0'
+    testCompile 'junit:junit:4.12'
 }
