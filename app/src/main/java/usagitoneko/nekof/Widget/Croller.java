@@ -283,7 +283,7 @@ public class Croller extends View {
 
     }
 
-    @Override
+    /*@Override
     public boolean onTouchEvent(MotionEvent e) {
 
         if (mListener != null)
@@ -341,7 +341,7 @@ public class Croller extends View {
             return true;
         }
         return super.onTouchEvent(e);
-    }
+    }*/
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
@@ -358,6 +358,7 @@ public class Croller extends View {
 
     public void setProgress(int x) {
         deg = x + 2;
+        invalidate();
     }
 
     public String getLabel() {
