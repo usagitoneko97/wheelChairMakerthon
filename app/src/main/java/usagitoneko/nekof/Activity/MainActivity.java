@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -66,6 +67,7 @@ import cz.msebera.android.httpclient.client.methods.HttpPost;
 import cz.msebera.android.httpclient.impl.client.HttpClientBuilder;
 import mehdi.sakout.fancybuttons.FancyButton;
 import usagitoneko.nekof.Widget.passwordView.PwdInputView;
+import usagitoneko.nekof.controller.WifiSSidPW;
 import usagitoneko.nekof.fragments.Loading_dialog;
 import usagitoneko.nekof.R;
 import usagitoneko.nekof.fragments.FragmentLog;
@@ -127,9 +129,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
         switch (v.getId()){
             case R.id.showPwSwitch:
                 password.setShadowPasswords(showPwSwitch.isChecked());
-               /* Intent intent = new Intent(this, JoystickController.class);
-                intent.putExtra("NAME", "whatever value want to parse");
-                startActivity(intent);*/
+
                 WifiConfiguration wifiConfig = new WifiConfiguration();
                 wifiConfig.SSID = String.format("\"%s\"", "Ultimake Makerthon");
                 wifiConfig.preSharedKey = String.format("\"%s\"", "Ultimake2017");
@@ -250,53 +250,49 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                     nfcv.connect();
                     if (nfcv.isConnected()) {
 
-                        byte[] buffer = new byte[100] ;
-                        byte[] ssid_L = new byte[4];
-                        byte[] ssid_H = new byte[4];
-                        byte[] ssid_U = new byte[4];
-                        byte[] ssidByte = new byte[12];
-                        byte[] wifiPasswordL = new byte[4];
-                        byte[] wifiPasswordH = new byte[4];
-                        byte[] wifiPasswordByte = new byte[8];
 
+                        byte[] bufferSSIDPW;
+                        byte[] buffer = new byte[10];
                         int passwordINT = Integer.valueOf(password.getText().toString());
-                        Log.v("intent", String.valueOf(passwordINT));
-                            nfcv.transceive(new byte[]{(byte) 0x02, (byte) 0x21, (byte) 0, (byte) ((passwordINT & 0xff00)>>8), (byte) (passwordINT&0x00ff), (byte) 0x72, (byte) 0x75}); //11 instead of 01 is because to avoid nfcv cant read 00 bug
+                        nfcv.transceive(new byte[]{(byte) 0x02, (byte) 0x21, (byte) 0, (byte) ((passwordINT & 0xff00)>>8), (byte) (passwordINT&0x00ff), (byte) 0x72, (byte) 0x75}); //11 instead of 01 is because to avoid nfcv cant read 00 bug
                             // TODO: 23/2/2017   should do checking at buffer
 
 
                             //MainFragment mainFragment = (MainFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.pager + ":0");
 
-                            while(((toInteger(buffer))&0x01)!=NFC_READCPLT) {
-                                buffer = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 20}); //read 0th byte (total 4 bytes)
+                            while(((toInteger(buffer))&0xff)!=PASSWORD_SUCCESS) {
+                                //keep reading till the mcu be able to send the password
+                                buffer = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 8}); //read 0th byte (total 4 bytes)
                             }
+
+                            /*refresh the byte for next time*/
+                            nfcv.transceive(new byte[]{(byte) 0x02, (byte) 0x21, (byte) 0, (byte) 0});
                             if(((toInteger(buffer))&0x02)!=PASSWORD_SUCCESS){
                                 //ERROR handling
                             }
                         /*buffer = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 20}); //read 0th byte (total 4 bytes)
                         buffer = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 20}); //read 0th byte (total 4 bytes)*/
-                        ssid_U = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 0});
-                        ssid_H = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 4});
-                        ssid_L = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 8});
-                        System.arraycopy(ssid_U, 0, ssidByte, 0, ssid_U.length);
-                        System.arraycopy(ssid_H, 0, ssidByte, ssid_U.length, ssid_H.length);
-                        System.arraycopy(ssid_L, 0, ssidByte, ssid_H.length, ssid_L.length);
-                        Log.v ("wifi", String.valueOf(toInteger(ssidByte)));
-                        wifiPasswordH = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 12});
-                        wifiPasswordL = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 16});
-                        System.arraycopy(wifiPasswordH, 0, wifiPasswordByte, 0, wifiPasswordH.length);
-                        System.arraycopy(wifiPasswordL, 0, wifiPasswordByte, wifiPasswordH.length, wifiPasswordL.length);
-                        Log.v ("wifi", String.valueOf(toInteger(wifiPasswordByte)));
+                        bufferSSIDPW = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 5});
+
+
+                        WifiSSidPW wifiSSidPW = new WifiSSidPW((toInteger(bufferSSIDPW))&0x00ff);
+
+                        String ssidResult = wifiSSidPW.getSSID();
+                        String wifiPasswordResult = wifiSSidPW.getWifiPassWord();
+
+                        /*debug proccess*/
+                        Log.d("ssid", ssidResult);
+                        Log.d("password", wifiPasswordResult);
 
                         /*convert bytes to ascii*/
-                        String ssid = new String(ssidByte);
-                        String wifiPassword = new String (wifiPasswordByte);
+
 
                         WifiConfiguration wifiConfig = new WifiConfiguration();
-                        wifiConfig.SSID = String.format("\"%s\"", ssid);
-                        wifiConfig.preSharedKey = String.format("\"%s\"", wifiPassword);
+                        wifiConfig.SSID = String.format("\"%s\"", ssidResult);
+                        wifiConfig.preSharedKey = String.format("\"%s\"", wifiPasswordResult);
 
                         WifiManager wifiManager = (WifiManager)getApplicationContext().getSystemService(WIFI_SERVICE);
+                        wifiManager.setWifiEnabled(true);
                         //remember id
                         int netId = wifiManager.addNetwork(wifiConfig);
                         wifiManager.disconnect();
@@ -306,6 +302,11 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                         // TODO: 4/8/2017 read again if fail
                         Toast.makeText(this, "successfully write in the tag! ", Toast.LENGTH_SHORT).show();
 
+                         Intent joystickIntent = new Intent(this, JoystickController.class);
+                        //intent.putExtra("NAME", "whatever value want to parse");
+                        if(passwordINT==1234) {
+                            startActivity(joystickIntent);
+                        }
                         /*ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
                         NetworkInfo mWifi = connManager.getAllNetworks(ConnectivityManager.TYPE_WIFI);
 

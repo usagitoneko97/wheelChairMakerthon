@@ -30,14 +30,12 @@ import java.io.UnsupportedEncodingException;
 
 import mehdi.sakout.fancybuttons.FancyButton;
 import usagitoneko.nekof.R;
-import usagitoneko.nekof.Widget.Croller;
 import usagitoneko.nekof.controller.MySingleton;
 
 
 public class JoystickController extends AppCompatActivity implements View.OnClickListener{
     View lineIndicator;
-    private TickerView kmperH;
-    private Croller croller;
+
     private FancyButton uTurnButton;
     private FancyButton forceStopButton;
     int[] location = new int[2];
@@ -59,14 +57,7 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
         /*Bundle data = getIntent().getExtras();
         String s = data.getString("NAME");
         Toast.makeText(this, s, Toast.LENGTH_SHORT).show();*/
-        kmperH = (TickerView)findViewById(R.id.kmPerH);
-        kmperH.setCharacterList(TickerUtils.getDefaultNumberList());
-        kmperH.setText("Km/H");
-        kmperH.bringToFront();
 
-        croller = (Croller)findViewById(R.id.croller);
-        croller = initCroller(croller);
-        croller.setMax(100);
 
         uTurnButton = (FancyButton)findViewById(R.id.uTurnButton);
         forceStopButton = (FancyButton)findViewById(R.id.forceStopButton);
@@ -92,12 +83,7 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
             public void onDrag(float degrees, float offset) {
                 // ..
                 float finalDegrees;
-                lineIndicator.getLocationOnScreen(location);
-                lineIndicator.setRotation(360-degrees);
-                lineIndicator.setLayoutParams(new ConstraintLayout.LayoutParams( Math.round(offset*556),11));
-                lineIndicator.setX(701);
-                lineIndicator.setY(726);
-                croller.setProgress(Math.round(offset*100));
+
                 if(degrees>0){
                     finalDegrees = (360-(degrees+180))+180;
 
@@ -108,6 +94,7 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
 
                 sendCommand("body",offset, degrees);
                 Log.v("angle", String.valueOf(finalDegrees));
+                Log.v("radius", String.valueOf(offset));
             }
 
             @Override
@@ -135,11 +122,7 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
         }
     }
 
-    private Croller initCroller(Croller croller){
-        croller.setIndicatorWidth(10);
 
-        return croller;
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
