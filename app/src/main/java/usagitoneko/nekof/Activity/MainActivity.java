@@ -267,6 +267,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                                 Toast.makeText(this, "please use '1234' and change the password inside", Toast.LENGTH_SHORT).show();
                                 return;
                             }
+                            WifiManager wifiManager = (WifiManager)getApplicationContext().getSystemService(WIFI_SERVICE);
+                            wifiManager.setWifiEnabled(true);
                             Intent joystickIntent = new Intent(this, JoystickController.class);
                             intent.putExtra("password",1234);
                             intent.putExtra("firstTimePassword", true);
@@ -278,7 +280,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                             // TODO: 12/4/2017 signed int to unsigned
                             if((buffer[1] == (((passwordINT&0xff00)>>8)))&&((buffer[2]) == (passwordINT&0xff))){
                                 /*password is correct*/
-                                //WifiManager wifi = (WifiManager) getApplicationContext(Context.WIFI_SERVICE);
+                                WifiManager wifiManager = (WifiManager)getApplicationContext().getSystemService(WIFI_SERVICE);
+                                wifiManager.setWifiEnabled(true);
                                 Intent joystickIntent = new Intent(this, JoystickController.class);
                                 intent.putExtra("password", passwordINT);
                                 intent.putExtra("firstTimePassword", false);
