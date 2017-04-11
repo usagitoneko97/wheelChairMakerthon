@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -32,6 +33,8 @@ import java.io.UnsupportedEncodingException;
 import mehdi.sakout.fancybuttons.FancyButton;
 import usagitoneko.nekof.R;
 import usagitoneko.nekof.controller.MySingleton;
+import usagitoneko.nekof.fragments.ChangePasswordDialog;
+import usagitoneko.nekof.fragments.Loading_dialog;
 
 
 public class JoystickController extends AppCompatActivity implements View.OnClickListener{
@@ -47,6 +50,8 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
     private static final String MOVE = "body";
 
     final int[] mSeekbarProgress = new int[1];
+
+    private boolean firstTimePassword;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +59,13 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
         mSeekbarProgress[0] = 100;
         Toolbar myToolbar = (Toolbar) findViewById(R.id.joystickToolbar);
         setSupportActionBar(myToolbar);
+
+        // TODO: 12/4/2017 Bundle data bugs: null exception
+        /*Bundle data = getIntent().getExtras();
+        firstTimePassword = data.getBoolean("firstTimePassword");
+        if(firstTimePassword){
+            //prompt user to change the password
+        }*/
         /*Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
         toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);*/
@@ -164,6 +176,12 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
             startActivity(settingsIntent);
 
             return true;
+        }
+        else if(id == R.id.action_changePassword){
+            FragmentManager fm = getSupportFragmentManager();
+            ChangePasswordDialog changePassword = new ChangePasswordDialog();
+            changePassword.show(fm,"loading");
+
         }
 
         return super.onOptionsItemSelected(item);

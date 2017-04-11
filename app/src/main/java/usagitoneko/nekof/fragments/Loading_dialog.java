@@ -52,9 +52,10 @@ public class Loading_dialog extends android.support.v4.app.DialogFragment {
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         callbacks.getWriteStatus(false);
                     }
-                }).show();
+                }).positiveText("Confirm").positiveColor(Color.GRAY).show();
 
     }
+    //change the password
 
 
     @Override

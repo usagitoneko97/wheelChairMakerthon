@@ -208,6 +208,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
 
     @Override
     protected void onPause() {
+
         if(mNfcAdapter!=null)
             stopForegroundDispatch(this, mNfcAdapter);
         super.onPause();
@@ -252,77 +253,41 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                     nfcv.connect();
                     if (nfcv.isConnected()) {
                         byte[] bufferSSIDPW;
-                        byte[] buffer = new byte[10];
-                        int passwordINT = Integer.valueOf(password.getText().toString());
+                        byte[] buffer ;
+                        int passwordINT = Integer.valueOf(password.getText().toString());// TODO: 11/4/2017 check if gettext = null, display error message
 
                         /*begin the password part*/
                         /*______________________________________________________________________________*/
                         /*send the init byte*/ /*send the password bytes*/
-                        nfcv.transceive(new byte[]{(byte) 0x02, (byte) 0x21, (byte) 0, (byte) 0x01, (byte) ((passwordINT & 0xff00)>>8), (byte) (passwordINT&0x00ff),  (byte) 0x00});
-
-                            // TODO: 23/2/2017   should do checking at buffer
-
-                        //*keep reading till the mcu send the confirmation byte*//*
-                        buffer = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 0});
-                        Toast.makeText(this, toInteger(buffer), Toast.LENGTH_SHORT).show();
-                        Log.e("confirmation", String.valueOf(((toInteger(buffer)))));
-                        while(((toInteger(buffer))&0xff)!= 0x01) {
-                        Log.e("sending", String.valueOf(((toInteger(buffer))&0xff)));
-                            buffer = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 7});
-                         }
-                        buffer = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 3});
-                        if(((toInteger(buffer))&0xff)== 0x01){
-                            /*//*the password is correct*//*
-                             //*______________________________________________________________________________*//*
-                       //*begin the wifi part*//*
-                       //*read the specific byte for ssid and password*//*
-                             bufferSSIDPW = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 4});
-
-                        //*get the ssid and the password from the class*//*
-                             WifiSSidPW wifiSSidPW = new WifiSSidPW((toInteger(bufferSSIDPW))&0x00ff);
-                             String ssidResult = wifiSSidPW.getSSID();
-                             String wifiPasswordResult = wifiSSidPW.getWifiPassWord();
-
-                        //*debug proccess*//*
-                             Log.d("ssid", ssidResult);
-                             Log.d("password", wifiPasswordResult);
-                            //*configure and enable wifi with the ssid and password*//*
-                             WifiConfiguration wifiConfig = new WifiConfiguration();
-                             wifiConfig.SSID = String.format("\"%s\"", ssidResult);
-                             wifiConfig.preSharedKey = String.format("\"%s\"", wifiPasswordResult);
-                             WifiManager wifiManager = (WifiManager)getApplicationContext().getSystemService(WIFI_SERVICE);
-                             wifiManager.setWifiEnabled(true);
-                             //remember id
-                             int netId = wifiManager.addNetwork(wifiConfig);
-                             wifiManager.disconnect();
-                             wifiManager.enableNetwork(netId, true);
-                             wifiManager.reconnect();
-
-                             // TODO: 4/8/2017 read again if fail
-                             Toast.makeText(this, "successfully write in the tag! ", Toast.LENGTH_SHORT).show();
-
-                             Intent joystickIntent = new Intent(this, JoystickController.class);
-                             //intent.putExtra("NAME", "whatever value want to parse");
-                                startActivity(joystickIntent);
-                            */
-                            Toast.makeText(this, "the password is correct!", Toast.LENGTH_SHORT).show();
-                         }
-                         else if (((toInteger(buffer))&0xff) == 0x02){
-                             //not the correct password
-                            Toast.makeText(this, "Incorrect password!!", Toast.LENGTH_SHORT).show();
-                         }
-                         else{
-                            //uknown error
-                            Toast.makeText(this, "Unknown Error!", Toast.LENGTH_SHORT).show();
+                        buffer = nfcv.transceive(new byte[]{0x02, 0x23, (byte) 0, (byte)0x02});
+                        if(toInteger(buffer) == 0){
+                            //the first time, initialize
+                            if(passwordINT!=1234){
+                                //wrong initial password, error message
+                                Toast.makeText(this, "please use '1234' and change the password inside", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            Intent joystickIntent = new Intent(this, JoystickController.class);
+                            intent.putExtra("password",1234);
+                            intent.putExtra("firstTimePassword", true);
+                            startActivity(joystickIntent);
+                            nfcv.transceive(new byte[]{0x02, 0x21, (byte) 0, (byte)0x04, (byte)0xd2, (byte)0x00, (byte)0x00});
                         }
-
-
-                        /*ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-                        NetworkInfo mWifi = connManager.getAllNetworks(ConnectivityManager.TYPE_WIFI);
-
-                        if (mWifi.isConnected()) {
-                            // Do whatever
-                        }*/
+                        else{
+                            buffer = nfcv.transceive(new byte[]{0x02, 0x23, (byte) 0, (byte)0x02});
+                            // TODO: 12/4/2017 signed int to unsigned
+                            if((buffer[1] == (((passwordINT&0xff00)>>8)))&&((buffer[2]) == (passwordINT&0xff))){
+                                /*password is correct*/
+                                //WifiManager wifi = (WifiManager) getApplicationContext(Context.WIFI_SERVICE);
+                                Intent joystickIntent = new Intent(this, JoystickController.class);
+                                intent.putExtra("password", passwordINT);
+                                intent.putExtra("firstTimePassword", false);
+                                startActivity(joystickIntent);
+                            }
+                            else{
+                                Toast.makeText(this, "password incorrect!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
                         nfcv.close();
 
                     }else
