@@ -22,6 +22,7 @@ import com.jmedeisis.bugstick.Joystick;
 import com.jmedeisis.bugstick.JoystickListener;
 import com.robinhood.ticker.TickerUtils;
 import com.robinhood.ticker.TickerView;
+import com.xw.repo.BubbleSeekBar;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,16 +39,19 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
 
     private FancyButton uTurnButton;
     private FancyButton forceStopButton;
+    private BubbleSeekBar speedSeekbar;
     int[] location = new int[2];
 
     private static final String UTURN = "uturn";
     private static final String FORCESTOP = "forcestop";
     private static final String MOVE = "body";
 
+    final int[] mSeekbarProgress = new int[1];
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.joystick_wrapper);
+        mSeekbarProgress[0] = 100;
         Toolbar myToolbar = (Toolbar) findViewById(R.id.joystickToolbar);
         setSupportActionBar(myToolbar);
         /*Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
@@ -61,22 +65,37 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
 
         uTurnButton = (FancyButton)findViewById(R.id.uTurnButton);
         forceStopButton = (FancyButton)findViewById(R.id.forceStopButton);
+        speedSeekbar = (BubbleSeekBar) findViewById(R.id.speedSeekbar);
         uTurnButton.setOnClickListener(this);
         forceStopButton.setOnClickListener(this);
 
-        final TickerView speedIndicator =(TickerView) findViewById(R.id.speedIndicator);
-        speedIndicator.setCharacterList(TickerUtils.getDefaultNumberList());
-        speedIndicator.bringToFront();
 
         lineIndicator.bringToFront();
 
-        //sendCommand(1);
+        speedSeekbar.setOnProgressChangedListener(new BubbleSeekBar.OnProgressChangedListener() {
+            @Override
+            public void onProgressChanged(int progress, float progressFloat) {
+
+            }
+
+            @Override
+            public void getProgressOnActionUp(int progress, float progressFloat) {
+                mSeekbarProgress[0] = progress;
+            }
+
+            @Override
+            public void getProgressOnFinally(int progress, float progressFloat) {
+
+            }
+        });
+
         Joystick joystick = (Joystick) findViewById(R.id.joystick);
         joystick.setJoystickListener(new JoystickListener() {
             @Override
             public void onDown() {
                 // ..
-                speedIndicator.setText("45");
+
+
             }
 
             @Override
@@ -91,16 +110,17 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
                 else {
                     finalDegrees = degrees*-1;
                 }
+                offset *= mSeekbarProgress[0]/100.00000;
 
-                sendCommand("body",offset, degrees);
-                Log.v("angle", String.valueOf(finalDegrees));
-                Log.v("radius", String.valueOf(offset));
+                sendCommand("body",offset, finalDegrees);
+                /*Log.v("angle", String.valueOf(finalDegrees));
+                Log.v("radius", String.valueOf(offset));*/
             }
 
             @Override
             public void onUp() {
                 lineIndicator.setLayoutParams(new ConstraintLayout.LayoutParams(1,1 ));
-                speedIndicator.setText("23");
+
                 sendCommand(MOVE, 0, 0);
                 // ..
             }
@@ -153,7 +173,7 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
         // TODO: 3/28/2017 send degrees and offset as json object
 
         StringBuilder uRLBuilder = new StringBuilder();
-        uRLBuilder.append("http://192.168.178.87/");
+        uRLBuilder.append("http://192.168.4.1/");
         uRLBuilder.append(operation);
         String URL = uRLBuilder.toString();
             JsonObjectRequest jsObjRequest = new JsonObjectRequest

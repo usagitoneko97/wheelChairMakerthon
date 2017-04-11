@@ -40,6 +40,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import com.kosalgeek.asynctask.AsyncResponse;
+import com.xw.repo.BubbleSeekBar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -88,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
     private PwdInputView password;
     private Switch showPwSwitch;
     private FancyButton submitBut;
+    private BubbleSeekBar speedSeekbar;
 
     private final int NFC_READCPLT = 0x01;
     private final int PASSWORD_SUCCESS = 0x02;
@@ -255,33 +257,36 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
 
                         /*begin the password part*/
                         /*______________________________________________________________________________*/
-                        /*send the init byte*/
-                        nfcv.transceive(new byte[]{(byte) 0x02, (byte) 0x21, (byte) 0, (byte) 0x01});
-                        /*send the password bytes*/
-                       /* nfcv.transceive(new byte[]{(byte) 0x02, (byte) 0x21, (byte) 1, (byte) ((passwordINT & 0xff00)>>8), (byte) (passwordINT&0x00ff), (byte) 0x72, (byte) 0x75});
+                        /*send the init byte*/ /*send the password bytes*/
+                        nfcv.transceive(new byte[]{(byte) 0x02, (byte) 0x21, (byte) 0, (byte) 0x01, (byte) ((passwordINT & 0xff00)>>8), (byte) (passwordINT&0x00ff),  (byte) 0x00});
+
                             // TODO: 23/2/2017   should do checking at buffer
 
-                        *//*keep reading till the mcu send the confirmation byte*//*
+                        //*keep reading till the mcu send the confirmation byte*//*
+                        buffer = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 0});
+                        Toast.makeText(this, toInteger(buffer), Toast.LENGTH_SHORT).show();
+                        Log.e("confirmation", String.valueOf(((toInteger(buffer)))));
                         while(((toInteger(buffer))&0xff)!= 0x01) {
+                        Log.e("sending", String.valueOf(((toInteger(buffer))&0xff)));
                             buffer = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 7});
                          }
                         buffer = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 3});
                         if(((toInteger(buffer))&0xff)== 0x01){
-                            *//*the password is correct*//**//*
-                             *//**//*______________________________________________________________________________*//**//*
-                       *//**//*begin the wifi part*//**//*
-                       *//**//*read the specific byte for ssid and password*//**//*
+                            /*//*the password is correct*//*
+                             //*______________________________________________________________________________*//*
+                       //*begin the wifi part*//*
+                       //*read the specific byte for ssid and password*//*
                              bufferSSIDPW = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 4});
 
-                        *//**//*get the ssid and the password from the class*//**//*
+                        //*get the ssid and the password from the class*//*
                              WifiSSidPW wifiSSidPW = new WifiSSidPW((toInteger(bufferSSIDPW))&0x00ff);
                              String ssidResult = wifiSSidPW.getSSID();
                              String wifiPasswordResult = wifiSSidPW.getWifiPassWord();
 
-                        *//**//*debug proccess*//**//*
+                        //*debug proccess*//*
                              Log.d("ssid", ssidResult);
                              Log.d("password", wifiPasswordResult);
-                        *//**//*configure and enable wifi with the ssid and password*//**//*
+                            //*configure and enable wifi with the ssid and password*//*
                              WifiConfiguration wifiConfig = new WifiConfiguration();
                              wifiConfig.SSID = String.format("\"%s\"", ssidResult);
                              wifiConfig.preSharedKey = String.format("\"%s\"", wifiPasswordResult);
@@ -298,7 +303,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
 
                              Intent joystickIntent = new Intent(this, JoystickController.class);
                              //intent.putExtra("NAME", "whatever value want to parse");
-                                startActivity(joystickIntent);*//*
+                                startActivity(joystickIntent);
+                            */
                             Toast.makeText(this, "the password is correct!", Toast.LENGTH_SHORT).show();
                          }
                          else if (((toInteger(buffer))&0xff) == 0x02){
@@ -308,7 +314,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                          else{
                             //uknown error
                             Toast.makeText(this, "Unknown Error!", Toast.LENGTH_SHORT).show();
-                        }*/
+                        }
 
 
                         /*ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
