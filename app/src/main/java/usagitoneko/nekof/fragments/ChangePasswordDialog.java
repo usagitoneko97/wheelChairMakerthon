@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentManager;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -18,11 +19,16 @@ public class ChangePasswordDialog extends android.support.v4.app.DialogFragment 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        return new MaterialDialog.Builder(getContext()).customView(R.layout.change_password, true). title("Place your phone close to the tag").negativeText("Cancel").negativeColor(Color.DKGRAY).canceledOnTouchOutside(false)
+        return new MaterialDialog.Builder(getContext()).customView(R.layout.change_password, true). title("Change your 4 digit password.").negativeText("Cancel").negativeColor(Color.DKGRAY).canceledOnTouchOutside(false)
                 .onNegative(new MaterialDialog.SingleButtonCallback(){
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         //callbacks.getWriteStatus(false);
+                    }
+                }).positiveText("Confirm").positiveColor(Color.GRAY).onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+
                     }
                 }).show();
     }

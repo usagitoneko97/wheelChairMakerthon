@@ -144,9 +144,19 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                 wifiManager.reconnect();
                 break;
             case R.id.submitPassword:
-                FragmentManager fm = getSupportFragmentManager();
-                Loading_dialog loading = new Loading_dialog();
-                loading.show(fm,"loading");
+                int passwordINT = Integer.valueOf(password.getText().toString());
+                if(passwordINT == 8888) {
+                    Intent joystickIntent = new Intent(this, JoystickController.class);
+                    joystickIntent.putExtra("password", passwordINT);
+                    joystickIntent.putExtra("firstTimePassword", false);
+                    startActivity(joystickIntent);
+                }
+                else {
+                    FragmentManager fm = getSupportFragmentManager();
+                    Loading_dialog loading = new Loading_dialog();
+                    loading.show(fm, "loading");
+                }
+                // TODO: 4/12/2017 debug purpose, remove it later
 
         }
     }
@@ -283,8 +293,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                                 WifiManager wifiManager = (WifiManager)getApplicationContext().getSystemService(WIFI_SERVICE);
                                 wifiManager.setWifiEnabled(true);
                                 Intent joystickIntent = new Intent(this, JoystickController.class);
-                                intent.putExtra("password", passwordINT);
-                                intent.putExtra("firstTimePassword", false);
+                                joystickIntent.putExtra("password", passwordINT);
+                                joystickIntent.putExtra("firstTimePassword", false);
                                 startActivity(joystickIntent);
                             }
                             else{

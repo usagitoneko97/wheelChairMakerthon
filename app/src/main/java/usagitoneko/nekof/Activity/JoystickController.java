@@ -1,7 +1,6 @@
 package usagitoneko.nekof.Activity;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentManager;
@@ -11,18 +10,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.jmedeisis.bugstick.Joystick;
 import com.jmedeisis.bugstick.JoystickListener;
-import com.robinhood.ticker.TickerUtils;
-import com.robinhood.ticker.TickerView;
 import com.xw.repo.BubbleSeekBar;
 
 import org.json.JSONException;
@@ -37,7 +31,7 @@ import usagitoneko.nekof.fragments.ChangePasswordDialog;
 import usagitoneko.nekof.fragments.Loading_dialog;
 
 
-public class JoystickController extends AppCompatActivity implements View.OnClickListener{
+public class JoystickController extends AppCompatActivity implements View.OnClickListener, Loading_dialog.Callbacks{
     View lineIndicator;
 
     private FancyButton uTurnButton;
@@ -139,6 +133,11 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
         });
 
 
+
+    }
+
+    @Override
+    public void getWriteStatus(boolean writeStatus) {
 
     }
 
