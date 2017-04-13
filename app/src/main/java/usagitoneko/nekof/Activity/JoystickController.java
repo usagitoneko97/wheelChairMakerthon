@@ -116,11 +116,12 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
                 else {
                     finalDegrees = degrees*-1;
                 }
-                offset *= mSeekbarProgress[0]/100.00000;
 
-                sendCommand("body",offset, finalDegrees);
-                /*Log.v("angle", String.valueOf(finalDegrees));
-                Log.v("radius", String.valueOf(offset));*/
+                offset *= mSeekbarProgress[0]/100.00000;
+                offset*=10;
+                sendCommand("body",offset, Math.round(finalDegrees));
+                Log.v("angle", String.valueOf(Math.round(finalDegrees)));
+                Log.v("radius", String.valueOf(Math.round(offset)));
             }
 
             @Override
@@ -128,6 +129,7 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
                 lineIndicator.setLayoutParams(new ConstraintLayout.LayoutParams(1,1 ));
 
                 sendCommand(MOVE, 0, 0);
+                // TODO: 4/13/2017 slowly decrease to zero
                 // ..
             }
         });
