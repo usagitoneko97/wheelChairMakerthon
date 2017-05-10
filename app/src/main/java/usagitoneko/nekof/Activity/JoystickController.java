@@ -1,7 +1,9 @@
 package usagitoneko.nekof.Activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -46,6 +49,7 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
     final int[] mSeekbarProgress = new int[1];
 
     private boolean firstTimePassword;
+    SharedPreferences settingsPreference;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +57,8 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
         mSeekbarProgress[0] = 100;
         Toolbar myToolbar = (Toolbar) findViewById(R.id.joystickToolbar);
         setSupportActionBar(myToolbar);
+        settingsPreference = PreferenceManager.getDefaultSharedPreferences(this);
+
 
         // TODO: 12/4/2017 Bundle data bugs: null exception
         /*Bundle data = getIntent().getExtras();
@@ -173,7 +179,7 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             // TODO: 4/8/2017 go to settings activity
-            Intent settingsIntent = new Intent(this, SettingsActivity.class);
+            Intent settingsIntent = new Intent(this, SettingAcitivity.class);
             startActivity(settingsIntent);
 
             return true;
