@@ -109,12 +109,12 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
                 // ..
                 float finalDegrees;
 
-                if(degrees>0){
-                    finalDegrees = (360-(degrees+180))+180;
+                if(degrees<0){
+                    finalDegrees = degrees+360;
 
                 }
                 else {
-                    finalDegrees = degrees*-1;
+                    finalDegrees = degrees;
                 }
 
                 offset *= mSeekbarProgress[0]/100.00000;
