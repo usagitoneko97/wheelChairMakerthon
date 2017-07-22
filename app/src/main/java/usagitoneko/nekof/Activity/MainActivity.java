@@ -112,7 +112,6 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
 
-
         //listen to button clicks
         if (mNfcAdapter == null) {
             Toast.makeText(this, "This device doesn't support NFC. ", Toast.LENGTH_SHORT).show();

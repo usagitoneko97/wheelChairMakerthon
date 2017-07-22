@@ -11,15 +11,14 @@
     <!-- Example General settings -->
     <string name="pref_header_general">General</string>
 
-    <string name="pref_title_social_recommendations">Enable social recommendations</string>
-    <string name="pref_description_social_recommendations">Recommendations for people to contact
-        based on your message history
+    <string name="pref_title_microstepping">Configure Microstepping</string>
+    <string name="pref_description_pref_title_microstepping">Configure microstepping of the whele chair
     </string>
 
-    <string name="pref_title_display_name">Display name</string>
-    <string name="pref_default_display_name">John Smith</string>
+    <string name="pref_title_broadcast_ssid">Broadcast ssid</string>
+    <string name="pref_description_broadcast_ssid">Option to discover ssid on wifi setting</string>
 
-    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
+    <string name="pref_title_change_password">Change password</string>
     <string-array name="pref_example_list_titles">
         <item>Always</item>
         <item>When possible</item>
@@ -29,6 +28,18 @@
         <item>1</item>
         <item>0</item>
         <item>-1</item>
+    </string-array>
+
+    <string-array name="pref_microstepping_list_titles">
+        <item>Slow</item>
+        <item>Fast</item>
+        <item>Very fast</item>
+    </string-array>
+
+    <string-array name="pref_microstepping_list_values">
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
     </string-array>
 
     <!-- Example settings for Data & Sync -->

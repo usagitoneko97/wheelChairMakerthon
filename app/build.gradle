@@ -49,6 +49,6 @@ dependencies {
     compile 'com.jmedeisis:bugstick:0.2.2'
     compile 'com.github.bassaer:materialdesigncolors:1.0.0'
     compile 'com.android.support:support-vector-drawable:25.2.0'
-    testCompile 'junit:junit:4.12'
     compile 'com.xw.repo:bubbleseekbar:3.2-lite'
+    testCompile 'junit:junit:4.12'
 }
