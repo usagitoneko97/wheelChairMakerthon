@@ -76,23 +76,56 @@ import usagitoneko.nekof.fragments.MainFragment;
 
 
 public class MainActivity extends AppCompatActivity implements MainFragment.onSomeEventListener, Loading_dialog.Callbacks, AsyncResponse, View.OnClickListener {
-    SimpleFragmentPagerAdapter pageAdapter;
-    NfcAdapter mNfcAdapter;
-    public TextView nfc_result;
     public static final String MIME_TEXT_PLAIN = "text/plain";
     public static final String TAG = "NfcDemo";
-    private List<Boolean> allLedStatus = new ArrayList<>();
     public final int WRITE_PERMISSION = 0;
-
-
+    private final int NFC_READCPLT = 0x01;
+    private final int PASSWORD_SUCCESS = 0x02;
+    public TextView nfc_result;
+    SimpleFragmentPagerAdapter pageAdapter;
+    NfcAdapter mNfcAdapter;
+    private List<Boolean> allLedStatus = new ArrayList<>();
     private ViewPager pager;
     private PwdInputView password;
     private Switch showPwSwitch;
     private FancyButton submitBut;
     private BubbleSeekBar speedSeekbar;
 
-    private final int NFC_READCPLT = 0x01;
-    private final int PASSWORD_SUCCESS = 0x02;
+    /**
+     * @param activity The corresponding {@link Activity} requesting the foreground dispatch.
+     * @param adapter  The {@link NfcAdapter} used for the foreground dispatch.
+     */
+    public static void setupForegroundDispatch(final Activity activity, NfcAdapter adapter) {
+        final Intent intent = new Intent(activity.getApplicationContext(), activity.getClass());
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        final PendingIntent pendingIntent = PendingIntent.getActivity(activity.getApplicationContext(), 0, intent, 0);
+
+        IntentFilter[] filters = new IntentFilter[1];
+        String[][] techList = new String[][]{new String[]{NfcV.class.getName()}}; //added NfcV
+
+        // Notice that this is the same filter as in our manifest.
+        filters[0] = new IntentFilter();
+        filters[0].addAction(NfcAdapter.ACTION_NDEF_DISCOVERED);
+        filters[0].addCategory(Intent.CATEGORY_DEFAULT);
+
+        try {
+            filters[0].addDataType(MIME_TEXT_PLAIN);
+        } catch (IntentFilter.MalformedMimeTypeException e) {
+            throw new RuntimeException("Check your mime type.");
+        }
+
+        adapter.enableForegroundDispatch(activity, pendingIntent, filters, techList);
+    }
+
+    /**
+     * @param activity The corresponding {@ink BaseActivity} requesting to stop the foreground dispatch.
+     * @param adapter  The {@link NfcAdapter} used for the foreground dispatch.
+     */
+    public static void stopForegroundDispatch(final Activity activity, NfcAdapter adapter) {
+        adapter.disableForegroundDispatch(activity);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -243,6 +276,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
 
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     public void onNewIntent(Intent intent) {
 
@@ -295,6 +329,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                                 joystickIntent.putExtra("password", passwordINT);
                                 joystickIntent.putExtra("firstTimePassword", false);
                                 startActivity(joystickIntent);
+                                finish();
                             }
                             else{
                                 Toast.makeText(this, "password incorrect!", Toast.LENGTH_SHORT).show();
@@ -397,41 +432,6 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
 
         return null;
     }
-    /**
-     * @param activity The corresponding {@link Activity} requesting the foreground dispatch.
-     * @param adapter  The {@link NfcAdapter} used for the foreground dispatch.
-     */
-    public static void setupForegroundDispatch(final Activity activity, NfcAdapter adapter) {
-        final Intent intent = new Intent(activity.getApplicationContext(), activity.getClass());
-        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-        final PendingIntent pendingIntent = PendingIntent.getActivity(activity.getApplicationContext(), 0, intent, 0);
-
-        IntentFilter[] filters = new IntentFilter[1];
-        String[][] techList = new String[][]{new String[]{NfcV.class.getName()}}; //added NfcV
-
-        // Notice that this is the same filter as in our manifest.
-        filters[0] = new IntentFilter();
-        filters[0].addAction(NfcAdapter.ACTION_NDEF_DISCOVERED);
-        filters[0].addCategory(Intent.CATEGORY_DEFAULT);
-
-        try {
-            filters[0].addDataType(MIME_TEXT_PLAIN);
-        } catch (IntentFilter.MalformedMimeTypeException e) {
-            throw new RuntimeException("Check your mime type.");
-        }
-
-        adapter.enableForegroundDispatch(activity, pendingIntent, filters, techList);
-    }
-
-    /**
-     * @param activity The corresponding {@ink BaseActivity} requesting to stop the foreground dispatch.
-     * @param adapter  The {@link NfcAdapter} used for the foreground dispatch.
-     */
-    public static void stopForegroundDispatch(final Activity activity, NfcAdapter adapter) {
-        adapter.disableForegroundDispatch(activity);
-    }
-
 
     public int toInteger(byte[] bytes){
         int result =0;
@@ -557,9 +557,9 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
 
     class MyAsyncTask extends AsyncTask<String, String, Void> {
 
-        private ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
         InputStream inputStream = null;
         String result = "";
+        private ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
 
         protected void onPreExecute() {
             progressDialog.setMessage("Downloading your data...");

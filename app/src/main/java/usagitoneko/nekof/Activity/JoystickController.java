@@ -35,21 +35,18 @@ import usagitoneko.nekof.fragments.Loading_dialog;
 
 
 public class JoystickController extends AppCompatActivity implements View.OnClickListener, Loading_dialog.Callbacks{
-    View lineIndicator;
-
-    private FancyButton uTurnButton;
-    private FancyButton forceStopButton;
-    private BubbleSeekBar speedSeekbar;
-    int[] location = new int[2];
-
     private static final String UTURN = "uturn";
     private static final String FORCESTOP = "forcestop";
     private static final String MOVE = "body";
-
     final int[] mSeekbarProgress = new int[1];
-
-    private boolean firstTimePassword;
+    View lineIndicator;
+    int[] location = new int[2];
     SharedPreferences settingsPreference;
+    private FancyButton uTurnButton;
+    private FancyButton forceStopButton;
+    private BubbleSeekBar speedSeekbar;
+    private boolean firstTimePassword;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -143,7 +140,10 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
 
 
     }
-
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
     @Override
     public void getWriteStatus(boolean writeStatus) {
 
