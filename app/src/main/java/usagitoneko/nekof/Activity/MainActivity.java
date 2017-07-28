@@ -305,10 +305,19 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                         /*______________________________________________________________________________*/
                         /*send the init byte*/ /*send the password bytes*/
                         nfcv.transceive(new byte[]{0x02, 0x21, (byte) 0, (byte)0x01, (byte)0x00, (byte)0x00, (byte)0x00}); //must be 4 bytes
-                        while((buffer[0] & 0x02) == 0){
-                            buffer = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 0});
+                        int i =0;
+                        for(i =0;i<200;i++){
+                            int j = 0;
                         }
-                        String WifiSsid = getWifi(nfcv);
+                        do{
+                            buffer = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 1});
+                            Log.d("buffer", String.valueOf(buffer[3]));
+                        }while((buffer[3]) != 3);
+                        Log.d("buffer", "complete");
+                        //String WifiSsid = getWifi(nfcv);
+
+                        //Toast.makeText(this, toInteger(buffer), Toast.LENGTH_SHORT).show();
+                       //Toast.makeText(this, WifiSsid, Toast.LENGTH_LONG).show();
                         Toast.makeText(this, "Send complete!", Toast.LENGTH_SHORT).show();
                         /*buffer = nfcv.transceive(new byte[]{0x02, 0x23, (byte) 0, (byte)0x02});
                         // TODO: 12/4/2017 signed int to unsigned
