@@ -302,7 +302,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                         /*begin the password part*/
                         /*______________________________________________________________________________*/
                         /*send the init byte*/ /*send the password bytes*/
-                        buffer = nfcv.transceive(new byte[]{0x02, 0x23, (byte) 0, (byte)0x02});
+                        buffer = nfcv.transceive(new byte[]{0x02, 0x21, (byte) 0, (byte)0x02});
                         if(toInteger(buffer) == 0){
                             //the first time, initialize
                             if(passwordINT!=1234){
