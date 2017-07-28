@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
             case R.id.showPwSwitch:
                 password.setShadowPasswords(showPwSwitch.isChecked());
 
-                WifiConfiguration wifiConfig = new WifiConfiguration();
+                /*WifiConfiguration wifiConfig = new WifiConfiguration();
                 wifiConfig.SSID = String.format("\"%s\"", "Ultimake Makerthon");
                 wifiConfig.preSharedKey = String.format("\"%s\"", "Ultimake2017");
 
@@ -173,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                 int netId = wifiManager.addNetwork(wifiConfig);
                 wifiManager.disconnect();
                 wifiManager.enableNetwork(netId, true);
-                wifiManager.reconnect();
+                wifiManager.reconnect();*/
                 break;
             case R.id.submitPassword:
                 int passwordINT = Integer.valueOf(password.getText().toString());
@@ -302,39 +302,24 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                         /*begin the password part*/
                         /*______________________________________________________________________________*/
                         /*send the init byte*/ /*send the password bytes*/
-                        buffer = nfcv.transceive(new byte[]{0x02, 0x23, (byte) 0, (byte)0x02});
-                        if(toInteger(buffer) == 0){
-                            //the first time, initialize
-                            if(passwordINT!=1234){
-                                //wrong initial password, error message
-                                Toast.makeText(this, "please use '1234' and change the password inside", Toast.LENGTH_SHORT).show();
-                                return;
-                            }
+                        nfcv.transceive(new byte[]{0x02, 0x21, (byte) 0, (byte) 0x01});
+                        Toast.makeText(this, "Send complete!", Toast.LENGTH_SHORT).show();
+                        /*buffer = nfcv.transceive(new byte[]{0x02, 0x23, (byte) 0, (byte)0x02});
+                        // TODO: 12/4/2017 signed int to unsigned
+                        if((buffer[1] == (((passwordINT&0xff00)>>8)))&&((buffer[2]) == (passwordINT&0xff))){
+                            *//*password is correct*//*
                             WifiManager wifiManager = (WifiManager)getApplicationContext().getSystemService(WIFI_SERVICE);
                             wifiManager.setWifiEnabled(true);
                             Intent joystickIntent = new Intent(this, JoystickController.class);
-                            intent.putExtra("password",1234);
-                            intent.putExtra("firstTimePassword", true);
+                            joystickIntent.putExtra("password", passwordINT);
+                            joystickIntent.putExtra("firstTimePassword", false);
                             startActivity(joystickIntent);
-                            nfcv.transceive(new byte[]{0x02, 0x21, (byte) 0, (byte)0x04, (byte)0xd2, (byte)0x00, (byte)0x00});
+                            finish();
                         }
                         else{
-                            buffer = nfcv.transceive(new byte[]{0x02, 0x23, (byte) 0, (byte)0x02});
-                            // TODO: 12/4/2017 signed int to unsigned
-                            if((buffer[1] == (((passwordINT&0xff00)>>8)))&&((buffer[2]) == (passwordINT&0xff))){
-                                /*password is correct*/
-                                WifiManager wifiManager = (WifiManager)getApplicationContext().getSystemService(WIFI_SERVICE);
-                                wifiManager.setWifiEnabled(true);
-                                Intent joystickIntent = new Intent(this, JoystickController.class);
-                                joystickIntent.putExtra("password", passwordINT);
-                                joystickIntent.putExtra("firstTimePassword", false);
-                                startActivity(joystickIntent);
-                                finish();
-                            }
-                            else{
                                 Toast.makeText(this, "password incorrect!", Toast.LENGTH_SHORT).show();
-                            }
-                        }
+                        }*/
+
                         nfcv.close();
 
                     }else
@@ -353,6 +338,14 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                 Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
                 writeTag(tag, ndefMessage);
             }
+        }
+    }
+
+    private void writeAndroidThere(NfcV nfcv){
+        try {
+            nfcv.transceive(new byte[]{0x02, 0x21, (byte) 0, (byte) 0x01});
+        }catch (IOException e){
+            Log.e("ERROR", "nfcv connection disrupted");
         }
     }
 
