@@ -297,12 +297,13 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                     if (nfcv.isConnected()) {
                         byte[] bufferSSIDPW;
                         byte[] buffer ;
-                        int passwordINT = Integer.valueOf(password.getText().toString());// TODO: 11/4/2017 check if gettext = null, display error message
+                        //int passwordINT = Integer.valueOf(password.getText().toString());// TODO: 11/4/2017 check if gettext = null, display error message
 
                         /*begin the password part*/
                         /*______________________________________________________________________________*/
                         /*send the init byte*/ /*send the password bytes*/
-                        nfcv.transceive(new byte[]{0x02, 0x21, (byte) 0, (byte) 0x01});
+                        buffer = nfcv.transceive(new byte[]{0x02, 0x21, (byte) 0, (byte)0x01, (byte)0x01, (byte)0x01, (byte)0x01}); //must be 4 bytes
+                        //Toast.makeText(this, buffer[1], Toast.LENGTH_SHORT).show();
                         Toast.makeText(this, "Send complete!", Toast.LENGTH_SHORT).show();
                         /*buffer = nfcv.transceive(new byte[]{0x02, 0x23, (byte) 0, (byte)0x02});
                         // TODO: 12/4/2017 signed int to unsigned
