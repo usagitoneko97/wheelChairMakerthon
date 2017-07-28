@@ -39,6 +39,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+
+import com.google.common.primitives.Bytes;
 import com.kosalgeek.asynctask.AsyncResponse;
 import com.xw.repo.BubbleSeekBar;
 
@@ -53,6 +55,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -163,7 +166,6 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
         switch (v.getId()){
             case R.id.showPwSwitch:
                 password.setShadowPasswords(showPwSwitch.isChecked());
-
                 /*WifiConfiguration wifiConfig = new WifiConfiguration();
                 wifiConfig.SSID = String.format("\"%s\"", "Ultimake Makerthon");
                 wifiConfig.preSharedKey = String.format("\"%s\"", "Ultimake2017");
@@ -296,14 +298,17 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                     nfcv.connect();
                     if (nfcv.isConnected()) {
                         byte[] bufferSSIDPW;
-                        byte[] buffer ;
+                        byte[] buffer = {0};
                         //int passwordINT = Integer.valueOf(password.getText().toString());// TODO: 11/4/2017 check if gettext = null, display error message
 
                         /*begin the password part*/
                         /*______________________________________________________________________________*/
                         /*send the init byte*/ /*send the password bytes*/
-                        buffer = nfcv.transceive(new byte[]{0x02, 0x21, (byte) 0, (byte)0x01, (byte)0x01, (byte)0x01, (byte)0x01}); //must be 4 bytes
-                        //Toast.makeText(this, buffer[1], Toast.LENGTH_SHORT).show();
+                        nfcv.transceive(new byte[]{0x02, 0x21, (byte) 0, (byte)0x01, (byte)0x00, (byte)0x00, (byte)0x00}); //must be 4 bytes
+                        while((buffer[0] & 0x02) == 0){
+                            buffer = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 0});
+                        }
+                        String WifiSsid = getWifi(nfcv);
                         Toast.makeText(this, "Send complete!", Toast.LENGTH_SHORT).show();
                         /*buffer = nfcv.transceive(new byte[]{0x02, 0x23, (byte) 0, (byte)0x02});
                         // TODO: 12/4/2017 signed int to unsigned
@@ -349,6 +354,24 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
             Log.e("ERROR", "nfcv connection disrupted");
         }
     }
+
+    private String getWifi(NfcV nfcv){
+        List<Byte> bufferList = new ArrayList<Byte>();
+        String ERROR = "ERROR";
+        byte[] buffer;
+
+
+        try {
+            bufferList.addAll(Bytes.asList(nfcv.transceive(new byte[]{0x02, 0x20, 0x01})));
+            bufferList.addAll(Bytes.asList(nfcv.transceive(new byte[]{0x02, 0x20, 0x05})));
+            buffer = Bytes.toArray(bufferList);
+            return new String(buffer, "UTF-8");
+        }catch (IOException e){
+            Log.e("ERROR", "nfcv connection disrupted");
+        }
+        return ERROR;
+    }
+
 
     boolean isNfcIntent(Intent intent) {
         return intent.hasExtra(NfcAdapter.EXTRA_TAG);
