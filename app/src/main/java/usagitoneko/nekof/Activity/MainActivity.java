@@ -23,6 +23,7 @@ import android.nfc.tech.NdefFormatable;
 import android.nfc.tech.NfcV;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -166,6 +167,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
         switch (v.getId()){
             case R.id.showPwSwitch:
                 password.setShadowPasswords(showPwSwitch.isChecked());
+
+
                 /*WifiConfiguration wifiConfig = new WifiConfiguration();
                 wifiConfig.SSID = String.format("\"%s\"", "Ultimake Makerthon");
                 wifiConfig.preSharedKey = String.format("\"%s\"", "Ultimake2017");
@@ -281,14 +284,14 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
 
     @Override
     public void onNewIntent(Intent intent) {
-
+        int NumbersOfRetry = 3;
         //stop the fragment dialog
 
         if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(intent.getAction()))
         {
 
             Tag detectedTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-            NfcV nfcv = NfcV.get(detectedTag);
+            final NfcV nfcv = NfcV.get(detectedTag);
             if(nfcv == null){
 
                 //not nfcV type
@@ -298,42 +301,35 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                     nfcv.connect();
                     if (nfcv.isConnected()) {
                         byte[] bufferSSIDPW;
-                        byte[] buffer = {0};
+                        final byte[] buffer = {0};
                         //int passwordINT = Integer.valueOf(password.getText().toString());// TODO: 11/4/2017 check if gettext = null, display error message
 
                         /*begin the password part*/
                         /*______________________________________________________________________________*/
                         /*send the init byte*/ /*send the password bytes*/
                         nfcv.transceive(new byte[]{0x02, 0x21, (byte) 0, (byte)0x01, (byte)0x00, (byte)0x00, (byte)0x00}); //must be 4 bytes
-                        int i =0;
-                        for(i =0;i<200;i++){
-                            int j = 0;
-                        }
-                        do{
-                            buffer = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 1});
-                            Log.d("buffer", String.valueOf(buffer[3]));
-                        }while((buffer[3]) != 3);
-                        Log.d("buffer", "complete");
-                        //String WifiSsid = getWifi(nfcv);
 
-                        //Toast.makeText(this, toInteger(buffer), Toast.LENGTH_SHORT).show();
-                       //Toast.makeText(this, WifiSsid, Toast.LENGTH_LONG).show();
-                        Toast.makeText(this, "Send complete!", Toast.LENGTH_SHORT).show();
-                        /*buffer = nfcv.transceive(new byte[]{0x02, 0x23, (byte) 0, (byte)0x02});
-                        // TODO: 12/4/2017 signed int to unsigned
-                        if((buffer[1] == (((passwordINT&0xff00)>>8)))&&((buffer[2]) == (passwordINT&0xff))){
-                            *//*password is correct*//*
-                            WifiManager wifiManager = (WifiManager)getApplicationContext().getSystemService(WIFI_SERVICE);
-                            wifiManager.setWifiEnabled(true);
-                            Intent joystickIntent = new Intent(this, JoystickController.class);
-                            joystickIntent.putExtra("password", passwordINT);
-                            joystickIntent.putExtra("firstTimePassword", false);
-                            startActivity(joystickIntent);
-                            finish();
-                        }
-                        else{
-                                Toast.makeText(this, "password incorrect!", Toast.LENGTH_SHORT).show();
-                        }*/
+                        final Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                    // Do something after 5s = 5000ms
+                                byte[] result;
+                                byte[] ssid;
+                                try {
+                                    nfcv.connect();
+                                    result = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 1});
+                                    ssid =  nfcv.transceive(new byte[]{0x02, 0x20, (byte) 0});
+                                    Log.v("result", String.valueOf(result[3]));
+                                    Log.v("resultSSID", String.valueOf(ssid[2]));
+                                    Log.v("resultSSID", String.valueOf(ssid[3]));
+                                    Log.v("resultSSID", String.valueOf(ssid[4]));
+                                    Log.v("resultSSID", String.valueOf(ssid[5]));
+                                }catch (IOException e){
+                                    Log.e("Error", ":ERROR exception in reading");
+                                }
+                            }
+                        }, 200);
 
                         nfcv.close();
 
@@ -342,7 +338,6 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                 } catch (IOException e) {
                     Log.e("Error", ":ERROR exception");
                 }
-
             }
         }
         else {  //has NDEF inside the tag
