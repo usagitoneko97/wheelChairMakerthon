@@ -2,6 +2,8 @@ package usagitoneko.nekof.Activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.media.Image;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.constraint.ConstraintLayout;
@@ -12,6 +14,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -45,6 +48,7 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
     private FancyButton uTurnButton;
     private FancyButton forceStopButton;
     private BubbleSeekBar speedSeekbar;
+    private ImageView torchLight;
     private boolean firstTimePassword;
 
     @Override
@@ -75,6 +79,8 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
         uTurnButton = (FancyButton)findViewById(R.id.uTurnButton);
         forceStopButton = (FancyButton)findViewById(R.id.forceStopButton);
         speedSeekbar = (BubbleSeekBar) findViewById(R.id.speedSeekbar);
+        torchLight = (ImageView) findViewById(R.id.torchLight);
+        torchLight.setOnClickListener(this);
         uTurnButton.setOnClickListener(this);
         forceStopButton.setOnClickListener(this);
 
@@ -157,6 +163,8 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
                 break;
             case R.id.forceStopButton:
                 sendCommand(FORCESTOP,0,0);
+            case R.id.torchLight:
+                Toast.makeText(this, "torchlight!!", Toast.LENGTH_SHORT).show();
                 break;
         }
     }

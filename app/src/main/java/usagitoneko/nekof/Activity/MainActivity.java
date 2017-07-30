@@ -82,6 +82,8 @@ import usagitoneko.nekof.fragments.MainFragment;
 public class MainActivity extends AppCompatActivity implements MainFragment.onSomeEventListener, Loading_dialog.Callbacks, AsyncResponse, View.OnClickListener {
     public static final String MIME_TEXT_PLAIN = "text/plain";
     public static final String TAG = "NfcDemo";
+    private static final int WIFI_SSID = 1;
+    private static final int WIFI_PASSWORD = 0;
     public final int WRITE_PERMISSION = 0;
     private final int NFC_READCPLT = 0x01;
     private final int PASSWORD_SUCCESS = 0x02;
@@ -300,6 +302,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                 try {
                     nfcv.connect();
                     if (nfcv.isConnected()) {
+                        Log.v("result", "onNewIntent called");
                         byte[] bufferSSIDPW;
                         final byte[] buffer = {0};
                         //int passwordINT = Integer.valueOf(password.getText().toString());// TODO: 11/4/2017 check if gettext = null, display error message
@@ -307,26 +310,51 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                         /*begin the password part*/
                         /*______________________________________________________________________________*/
                         /*send the init byte*/ /*send the password bytes*/
-                        nfcv.transceive(new byte[]{0x02, 0x21, (byte) 0, (byte)0x01, (byte)0x00, (byte)0x00, (byte)0x00}); //must be 4 bytes
+                        nfcv.transceive(new byte[]{0x02, 0x21, (byte) 0, (byte)0x02, (byte)0x00, (byte)0x00, (byte)0x00}); //must be 4 bytes
 
                         final Handler handler = new Handler();
                         handler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                    // Do something after 5s = 5000ms
                                 byte[] result;
                                 byte[] ssid;
                                 try {
                                     nfcv.connect();
-                                    result = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 1});
-                                    ssid =  nfcv.transceive(new byte[]{0x02, 0x20, (byte) 0});
-                                    Log.v("result", String.valueOf(result[3]));
-                                    Log.v("resultSSID", String.valueOf(ssid[2]));
+                                    result = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 0});
+                                    //ssid =  nfcv.transceive(new byte[]{0x02, 0x20, (byte) 0});
+                                    Log.v("result", String.valueOf(result[1]));
+                                    if(result[1] == 1){
+                                        //it's correct
+                                        String ssidString = getWifi(nfcv, WIFI_SSID);
+                                        String pwString = getWifi(nfcv, WIFI_PASSWORD);
+                                        Log.v("resultString", getWifi(nfcv, WIFI_SSID));
+                                        Log.v("resultString", getWifi(nfcv, WIFI_PASSWORD));
+
+                                        WifiConfiguration conf = new WifiConfiguration();
+                                        conf.SSID = "\"" + ssidString + "\"";   // Please note the quotes. String should contain ssid in quotes
+                                        conf.preSharedKey = "\""+ pwString +"\"";
+                                        conf.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
+                                        WifiManager wifiManager = (WifiManager)getApplicationContext().getSystemService(WIFI_SERVICE);
+                                        wifiManager.addNetwork(conf);
+
+                                        List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
+                                        for( WifiConfiguration i : list ) {
+                                            if(i.SSID != null && i.SSID.equals("\"" + ssidString + "\"")) {
+                                                wifiManager.disconnect();
+                                                wifiManager.enableNetwork(i.networkId, true);
+                                                wifiManager.reconnect();
+
+                                                break;
+                                            }
+                                        }
+                                        nfcv.transceive(new byte[]{0x02, 0x21, (byte) 0, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00}); //must be 4 bytes
+                                    }
+                                    /*Log.v("resultSSID", String.valueOf(ssid[2]));
                                     Log.v("resultSSID", String.valueOf(ssid[3]));
                                     Log.v("resultSSID", String.valueOf(ssid[4]));
-                                    Log.v("resultSSID", String.valueOf(ssid[5]));
+                                    Log.v("resultSSID", String.valueOf(ssid[5]));*/
                                 }catch (IOException e){
-                                    Log.e("Error", ":ERROR exception in reading");
+                                    Log.e("result", ":ERROR exception in reading");
                                 }
                             }
                         }, 200);
@@ -334,9 +362,9 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                         nfcv.close();
 
                     }else
-                        Log.e("Error", ":nfcv not connected");
+                        Log.e("result", ":nfcv not connected");
                 } catch (IOException e) {
-                    Log.e("Error", ":ERROR exception");
+                    Log.e("result", ":ERROR exception");
                 }
             }
         }
@@ -359,21 +387,57 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
         }
     }
 
-    private String getWifi(NfcV nfcv){
+    private String getWifi(NfcV nfcv, int ssidOrPw){
         List<Byte> bufferList = new ArrayList<Byte>();
         String ERROR = "ERROR";
+        byte[] bufferFirst4;
+        byte[] bufferSecond4;
+
+        Byte[] bufferFirst4OBJ;
+        Byte[] bufferSecond4OBJ;
+
         byte[] buffer;
 
 
         try {
-            bufferList.addAll(Bytes.asList(nfcv.transceive(new byte[]{0x02, 0x20, 0x01})));
-            bufferList.addAll(Bytes.asList(nfcv.transceive(new byte[]{0x02, 0x20, 0x05})));
+            if(ssidOrPw == WIFI_SSID) {
+                bufferFirst4 = nfcv.transceive(new byte[]{0x02, 0x20, 0x01});
+                bufferSecond4 = nfcv.transceive(new byte[]{0x02, 0x20, 0x02});
+            }
+            else {
+                bufferFirst4 = nfcv.transceive(new byte[]{0x02, 0x20, 0x03});
+                bufferSecond4 = nfcv.transceive(new byte[]{0x02, 0x20, 0x04});
+            }
+
+            bufferFirst4OBJ = toObjects(bufferFirst4);
+            bufferSecond4OBJ = toObjects(bufferSecond4);
+
+            bufferList.add(bufferFirst4OBJ[1]);
+            bufferList.add(bufferFirst4OBJ[2]);
+            bufferList.add(bufferFirst4OBJ[3]);
+            bufferList.add(bufferFirst4OBJ[4]);
+
+            bufferList.add(bufferSecond4OBJ[1]);
+            bufferList.add(bufferSecond4OBJ[2]);
+            bufferList.add(bufferSecond4OBJ[3]);
+            bufferList.add(bufferSecond4OBJ[4]);
+
             buffer = Bytes.toArray(bufferList);
             return new String(buffer, "UTF-8");
         }catch (IOException e){
             Log.e("ERROR", "nfcv connection disrupted");
         }
         return ERROR;
+    }
+
+    // byte[] to Byte[]
+    Byte[] toObjects(byte[] bytesPrim) {
+        Byte[] bytes = new Byte[bytesPrim.length];
+
+        int i = 0;
+        for (byte b : bytesPrim) bytes[i++] = b; // Autoboxing
+
+        return bytes;
     }
 
 
