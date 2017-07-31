@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -22,6 +23,7 @@ import android.nfc.tech.Ndef;
 import android.nfc.tech.NdefFormatable;
 import android.nfc.tech.NfcV;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -97,6 +99,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
     private FancyButton submitBut;
     private BubbleSeekBar speedSeekbar;
 
+    public static final String PASSWORD = "sohai12345";
+
     /**
      * @param activity The corresponding {@link Activity} requesting the foreground dispatch.
      * @param adapter  The {@link NfcAdapter} used for the foreground dispatch.
@@ -171,16 +175,21 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                 password.setShadowPasswords(showPwSwitch.isChecked());
 
 
-                /*WifiConfiguration wifiConfig = new WifiConfiguration();
-                wifiConfig.SSID = String.format("\"%s\"", "Ultimake Makerthon");
-                wifiConfig.preSharedKey = String.format("\"%s\"", "Ultimake2017");
+                WifiConfiguration wifiConfiguration = new WifiConfiguration();
+                wifiConfiguration.SSID = "\"" + "5Fo0DB4d" + "\"";
+                wifiConfiguration.preSharedKey = "\"" + "thereisnospoon" + "\"";
 
-                WifiManager wifiManager = (WifiManager)getApplicationContext().getSystemService(WIFI_SERVICE);
-                //remember id
-                int netId = wifiManager.addNetwork(wifiConfig);
-                wifiManager.disconnect();
-                wifiManager.enableNetwork(netId, true);
-                wifiManager.reconnect();*/
+                WifiManager wifiManager = (WifiManager) getBaseContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                int networkId = wifiManager.addNetwork(wifiConfiguration);
+                if (networkId != -1)
+                {
+                    Log.d("network", "sucess");
+                    wifiManager.enableNetwork(networkId, true);
+                    // Use this to permanently save this network
+                    // Otherwise, it will disappear after a reboot
+                    wifiManager.saveConfiguration();
+                }
+
                 break;
             case R.id.submitPassword:
                 int passwordINT = Integer.valueOf(password.getText().toString());
@@ -327,27 +336,29 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                                         //it's correct
                                         String ssidString = getWifi(nfcv, WIFI_SSID);
                                         String pwString = getWifi(nfcv, WIFI_PASSWORD);
-                                        Log.v("resultString", getWifi(nfcv, WIFI_SSID));
-                                        Log.v("resultString", getWifi(nfcv, WIFI_PASSWORD));
-
-                                        WifiConfiguration conf = new WifiConfiguration();
-                                        conf.SSID = "\"" + ssidString + "\"";   // Please note the quotes. String should contain ssid in quotes
-                                        conf.preSharedKey = "\""+ pwString +"\"";
-                                        conf.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
-                                        WifiManager wifiManager = (WifiManager)getApplicationContext().getSystemService(WIFI_SERVICE);
-                                        wifiManager.addNetwork(conf);
-
-                                        List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
-                                        for( WifiConfiguration i : list ) {
-                                            if(i.SSID != null && i.SSID.equals("\"" + ssidString + "\"")) {
-                                                wifiManager.disconnect();
-                                                wifiManager.enableNetwork(i.networkId, true);
-                                                wifiManager.reconnect();
-
-                                                break;
-                                            }
-                                        }
+                                        Log.v("resultString", ssidString);
+                                        Log.v("resultString", pwString);
                                         nfcv.transceive(new byte[]{0x02, 0x21, (byte) 0, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00}); //must be 4 bytes
+
+                                        WifiConfiguration wifiConfiguration = new WifiConfiguration();
+                                        wifiConfiguration.SSID = "\"" + ssidString + "\"";
+                                        wifiConfiguration.preSharedKey = "\"" + "thereisnospoon" + "\"";
+
+                                        WifiManager wifiManager = (WifiManager) getBaseContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                                        int networkId = wifiManager.addNetwork(wifiConfiguration);
+                                        if (networkId != -1)
+                                        {
+                                            Log.d("network", "sucess");
+                                            wifiManager.enableNetwork(networkId, true);
+                                            // Use this to permanently save this network
+                                            // Otherwise, it will disappear after a reboot
+                                            wifiManager.saveConfiguration();
+                                        }
+
+
+                                    }
+                                    else{
+                                        Toast.makeText(MainActivity.this, "Please tap again!!", Toast.LENGTH_SHORT).show();
                                     }
                                     /*Log.v("resultSSID", String.valueOf(ssid[2]));
                                     Log.v("resultSSID", String.valueOf(ssid[3]));
@@ -378,6 +389,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
             }
         }
     }
+
 
     private void writeAndroidThere(NfcV nfcv){
         try {
