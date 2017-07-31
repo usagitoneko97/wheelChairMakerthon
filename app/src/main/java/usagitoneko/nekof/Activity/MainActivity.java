@@ -342,9 +342,10 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
 
                                         WifiConfiguration wifiConfiguration = new WifiConfiguration();
                                         wifiConfiguration.SSID = "\"" + ssidString + "\"";
-                                        wifiConfiguration.preSharedKey = "\"" + "thereisnospoon" + "\"";
+                                        wifiConfiguration.preSharedKey = "\"" + pwString + ssidString+ "\"";
 
                                         WifiManager wifiManager = (WifiManager) getBaseContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                                        wifiManager.setWifiEnabled(true);
                                         int networkId = wifiManager.addNetwork(wifiConfiguration);
                                         if (networkId != -1)
                                         {
@@ -352,7 +353,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                                             wifiManager.enableNetwork(networkId, true);
                                             // Use this to permanently save this network
                                             // Otherwise, it will disappear after a reboot
-                                            wifiManager.saveConfiguration();
+                                            //wifiManager.saveConfiguration();
                                         }
 
 
