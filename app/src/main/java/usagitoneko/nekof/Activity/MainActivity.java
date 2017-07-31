@@ -4,16 +4,10 @@ package usagitoneko.nekof.Activity;
 
 import android.app.Activity;
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -23,58 +17,31 @@ import android.nfc.tech.Ndef;
 import android.nfc.tech.NdefFormatable;
 import android.nfc.tech.NfcV;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
 
 import com.google.common.primitives.Bytes;
 import com.kosalgeek.asynctask.AsyncResponse;
-import com.xw.repo.BubbleSeekBar;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-
-import cz.msebera.android.httpclient.HttpEntity;
-import cz.msebera.android.httpclient.HttpResponse;
-import cz.msebera.android.httpclient.NameValuePair;
-import cz.msebera.android.httpclient.client.ClientProtocolException;
-import cz.msebera.android.httpclient.client.HttpClient;
-import cz.msebera.android.httpclient.client.entity.UrlEncodedFormEntity;
-import cz.msebera.android.httpclient.client.methods.HttpPost;
-import cz.msebera.android.httpclient.impl.client.HttpClientBuilder;
 import mehdi.sakout.fancybuttons.FancyButton;
 import usagitoneko.nekof.Widget.passwordView.PwdInputView;
-import usagitoneko.nekof.controller.WifiSSidPW;
 import usagitoneko.nekof.fragments.Loading_dialog;
 import usagitoneko.nekof.R;
 import usagitoneko.nekof.fragments.FragmentLog;
@@ -87,19 +54,12 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
     private static final int WIFI_SSID = 1;
     private static final int WIFI_PASSWORD = 0;
     public final int WRITE_PERMISSION = 0;
-    private final int NFC_READCPLT = 0x01;
-    private final int PASSWORD_SUCCESS = 0x02;
     public TextView nfc_result;
-    SimpleFragmentPagerAdapter pageAdapter;
     NfcAdapter mNfcAdapter;
     private List<Boolean> allLedStatus = new ArrayList<>();
-    private ViewPager pager;
     private PwdInputView password;
     private Switch showPwSwitch;
     private FancyButton submitBut;
-    private BubbleSeekBar speedSeekbar;
-
-    public static final String PASSWORD = "sohai12345";
 
     /**
      * @param activity The corresponding {@link Activity} requesting the foreground dispatch.
@@ -173,22 +133,6 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
         switch (v.getId()){
             case R.id.showPwSwitch:
                 password.setShadowPasswords(showPwSwitch.isChecked());
-
-
-                WifiConfiguration wifiConfiguration = new WifiConfiguration();
-                wifiConfiguration.SSID = "\"" + "5Fo0DB4d" + "\"";
-                wifiConfiguration.preSharedKey = "\"" + "thereisnospoon" + "\"";
-
-                WifiManager wifiManager = (WifiManager) getBaseContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                int networkId = wifiManager.addNetwork(wifiConfiguration);
-                if (networkId != -1)
-                {
-                    Log.d("network", "sucess");
-                    wifiManager.enableNetwork(networkId, true);
-                    // Use this to permanently save this network
-                    // Otherwise, it will disappear after a reboot
-                    wifiManager.saveConfiguration();
-                }
 
                 break;
             case R.id.submitPassword:
@@ -295,7 +239,6 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
 
     @Override
     public void onNewIntent(Intent intent) {
-        int NumbersOfRetry = 3;
         //stop the fragment dialog
 
         if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(intent.getAction()))
@@ -312,8 +255,6 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                     nfcv.connect();
                     if (nfcv.isConnected()) {
                         Log.v("result", "onNewIntent called");
-                        byte[] bufferSSIDPW;
-                        final byte[] buffer = {0};
                         //int passwordINT = Integer.valueOf(password.getText().toString());// TODO: 11/4/2017 check if gettext = null, display error message
 
                         /*begin the password part*/
@@ -326,11 +267,9 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                             @Override
                             public void run() {
                                 byte[] result;
-                                byte[] ssid;
                                 try {
                                     nfcv.connect();
                                     result = nfcv.transceive(new byte[]{0x02, 0x20, (byte) 0});
-                                    //ssid =  nfcv.transceive(new byte[]{0x02, 0x20, (byte) 0});
                                     Log.v("result", String.valueOf(result[1]));
                                     if(result[1] == 1){
                                         //it's correct
@@ -351,9 +290,6 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                                         {
                                             Log.d("network", "sucess");
                                             wifiManager.enableNetwork(networkId, true);
-                                            // Use this to permanently save this network
-                                            // Otherwise, it will disappear after a reboot
-                                            //wifiManager.saveConfiguration();
                                         }
 
 
@@ -361,22 +297,22 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                                     else{
                                         Toast.makeText(MainActivity.this, "Please tap again!!", Toast.LENGTH_SHORT).show();
                                     }
-                                    /*Log.v("resultSSID", String.valueOf(ssid[2]));
-                                    Log.v("resultSSID", String.valueOf(ssid[3]));
-                                    Log.v("resultSSID", String.valueOf(ssid[4]));
-                                    Log.v("resultSSID", String.valueOf(ssid[5]));*/
                                 }catch (IOException e){
                                     Log.e("result", ":ERROR exception in reading");
+                                    Toast.makeText(MainActivity.this, "Please tap again!!", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         }, 200);
 
                         nfcv.close();
 
-                    }else
+                    }else {
                         Log.e("result", ":nfcv not connected");
+                        Toast.makeText(MainActivity.this, "Please tap again!!", Toast.LENGTH_SHORT).show();
+                    }
                 } catch (IOException e) {
                     Log.e("result", ":ERROR exception");
+                    Toast.makeText(MainActivity.this, "Please tap again!!", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -391,14 +327,6 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
         }
     }
 
-
-    private void writeAndroidThere(NfcV nfcv){
-        try {
-            nfcv.transceive(new byte[]{0x02, 0x21, (byte) 0, (byte) 0x01});
-        }catch (IOException e){
-            Log.e("ERROR", "nfcv connection disrupted");
-        }
-    }
 
     private String getWifi(NfcV nfcv, int ssidOrPw){
         List<Byte> bufferList = new ArrayList<Byte>();
@@ -653,91 +581,6 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
     }
 
 
-    class MyAsyncTask extends AsyncTask<String, String, Void> {
-
-        InputStream inputStream = null;
-        String result = "";
-        private ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
-
-        protected void onPreExecute() {
-            progressDialog.setMessage("Downloading your data...");
-            progressDialog.show();
-            progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                public void onCancel(DialogInterface arg0) {
-                    MyAsyncTask.this.cancel(true);
-                }
-            });
-        }
-
-        @Override
-        protected Void doInBackground(String... params) {
-
-            //String url_select = "http://raw.githubusercontent.com/usagitoneko97/Stm32-and-nfc02A1-led-control/finalOfLayout/jsonDummy1.json";
-            String url_select = "https://quarkbackend.com/getfile/hogouxian/jsontest";
-            ArrayList<NameValuePair> param = new ArrayList<NameValuePair>();
-
-            try {
-                // Set up HTTP post
-                // HttpClient is more then less deprecated. Need to change to URLConnection
-                HttpClient httpClient = HttpClientBuilder.create().build();
-                HttpPost httpPost = new HttpPost(url_select);
-                httpPost.setEntity(new UrlEncodedFormEntity(param));
-                HttpResponse httpResponse = httpClient.execute(httpPost);
-                HttpEntity httpEntity = httpResponse.getEntity();
-
-                // Read content & Log
-                inputStream = httpEntity.getContent();
-            } catch (UnsupportedEncodingException e1) {
-                Log.e("UnsupportedEncoding", e1.toString());
-                e1.printStackTrace();
-            } catch (ClientProtocolException e2) {
-                Log.e("ClientProtocolException", e2.toString());
-                e2.printStackTrace();
-            } catch (IllegalStateException e3) {
-                Log.e("IllegalStateException", e3.toString());
-                e3.printStackTrace();
-            } catch (IOException e4) {
-                Log.e("IOException", e4.toString());
-                e4.printStackTrace();
-            }
-            // Convert response to string using String Builder
-            try {
-                BufferedReader bReader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"), 8);
-                StringBuilder sBuilder = new StringBuilder();
-
-                String line = null;
-                while ((line = bReader.readLine()) != null) {
-                    sBuilder.append(line + "\n");
-                }
-
-                inputStream.close();
-                result = sBuilder.toString();
-
-            } catch (Exception e) {
-                Log.e("StringBuilding & ", "Error converting result " + e.toString());
-            }
-            return null;
-        }
-        protected void onPostExecute(Void v) {
-            //parse JSON data
-            Toast.makeText(MainActivity.this, result, Toast.LENGTH_SHORT).show();
-            try {
-                JSONArray jArray = new JSONArray(result);
-                for(int i=0; i < jArray.length(); i++) {
-
-                    JSONObject jObject = jArray.getJSONObject(i);
-
-                    String name = jObject.getString("name");
-                    String tab1_text = jObject.getString("tab1_text");
-                    int active = jObject.getInt("active");
-
-                } // End Loop
-                this.progressDialog.dismiss();
-            } catch (JSONException e) {
-                Log.e("JSONException", "Error: " + e.toString());
-            } // catch (JSONException e)
-        } // protected void onPostExecute(Void v)
-    }
 
 }
 
