@@ -4,10 +4,14 @@ package usagitoneko.nekof.Activity;
 
 import android.app.Activity;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -19,6 +23,7 @@ import android.nfc.tech.NfcV;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -101,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
         super.onCreate(savedInstanceState);
         setContentView(R.layout.wheel_chair);
 
-        password = (PwdInputView)findViewById(R.id.password);
+        password = (PwdInputView) findViewById(R.id.password);
 
 
         showPwSwitch = (Switch) findViewById(R.id.showPwSwitch);
@@ -127,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
             //display whatever title desired
         }
     }
+
 
     @Override
     public void onClick(View v) {
@@ -275,8 +281,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                                         //it's correct
                                         String ssidString = getWifi(nfcv, WIFI_SSID);
                                         String pwString = getWifi(nfcv, WIFI_PASSWORD);
-                                        Log.v("resultString", ssidString);
-                                        Log.v("resultString", pwString);
+                                        Log.d("resultString", ssidString);
+                                        Log.d("resultString", pwString);
                                         nfcv.transceive(new byte[]{0x02, 0x21, (byte) 0, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00}); //must be 4 bytes
 
                                         WifiConfiguration wifiConfiguration = new WifiConfiguration();
@@ -288,10 +294,9 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                                         int networkId = wifiManager.addNetwork(wifiConfiguration);
                                         if (networkId != -1)
                                         {
-                                            Log.d("network", "sucess");
+                                            Log.d("result", "sucess");
                                             wifiManager.enableNetwork(networkId, true);
                                         }
-
 
                                     }
                                     else{
@@ -326,7 +331,22 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
             }
         }
     }
+    private boolean checkWifiOnAndConnected() {
+        WifiManager wifiMgr = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
+        if (wifiMgr.isWifiEnabled()) { // Wi-Fi adapter is ON
+
+            WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
+
+            if( wifiInfo.getNetworkId() == -1 ){
+                return false; // Not connected to an access point
+            }
+            return true; // Connected to an access point
+        }
+        else {
+            return false; // Wi-Fi adapter is OFF
+        }
+    }
 
     private String getWifi(NfcV nfcv, int ssidOrPw){
         List<Byte> bufferList = new ArrayList<Byte>();
