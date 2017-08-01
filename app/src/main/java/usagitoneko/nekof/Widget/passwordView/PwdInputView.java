@@ -21,7 +21,7 @@ import java.lang.reflect.Field;
  * Created by lumingmin on 16/6/16.
  */
 
-public class PwdInputView extends EditText {
+public class PwdInputView extends android.support.v7.widget.AppCompatEditText {
     private Paint mPaint;
     private Paint mPaintContent;
     private Paint mPaintArc;
@@ -42,15 +42,16 @@ public class PwdInputView extends EditText {
     private int defalutPicId = -1;
 
     private ViewType mViewType = ViewType.DEFAULT;
+    private int bgColor = Color.WHITE;
+    private int underLineColor = Color.GRAY;
+    private int textColor = Color.argb(155, 0, 0, 0);
 
     public PwdInputView(Context context) {
         this(context, null);
     }
-
     public PwdInputView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
-
     public PwdInputView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initPaint();
@@ -61,14 +62,6 @@ public class PwdInputView extends EditText {
             }
         });
 
-    }
-
-    private int bgColor = Color.WHITE;
-    private int underLineColor = Color.GRAY;
-    private int textColor = Color.argb(155, 0, 0, 0);
-
-    public enum ViewType {
-        DEFAULT, UNDERLINE, BIASLINE
     }
 
     @Override
@@ -195,11 +188,7 @@ public class PwdInputView extends EditText {
     @Override
     protected void onTextChanged(CharSequence text, int start, int lengthBefore, int lengthAfter) {
         super.onTextChanged(text, start, lengthBefore, lengthAfter);
-        if (text.toString().length() - this.textLength >= 0) {
-            addText = true;
-        } else {
-            addText = false;
-        }
+        addText = text.toString().length() - this.textLength >= 0;
 
         this.textLength = text.toString().length();
         if (textLength <= getMaxLength()) {
@@ -238,19 +227,6 @@ public class PwdInputView extends EditText {
 
 
     }
-
-    private class PaintLastArcAnim extends Animation {
-        @Override
-        protected void applyTransformation(float time, Transformation t) {
-            super.applyTransformation(time, t);
-//            radiusArc_last = radiusArc * interpolatedTime;
-            interpolatedTime = time;
-            postInvalidate();
-
-
-        }
-    }
-
 
     public int getMaxLength() {
 
@@ -312,7 +288,6 @@ public class PwdInputView extends EditText {
 
     }
 
-
     public void setShadowPasswords(boolean show) {
         this.isShadowPasswords = show;
         this.defalutPicId = -1;
@@ -320,7 +295,6 @@ public class PwdInputView extends EditText {
         postInvalidate();
 
     }
-
 
     public void setShadowPasswords(boolean show, String defaultStr) {
         this.isShadowPasswords = show;
@@ -344,7 +318,6 @@ public class PwdInputView extends EditText {
 
     }
 
-
     public void setPwdInputViewType(ViewType type) {
         this.mViewType = type;
 
@@ -365,8 +338,25 @@ public class PwdInputView extends EditText {
     public void setUnderLineColor(int underLineColor) {
         this.underLineColor = underLineColor;
     }
+
     public void setNumTextColor(int textColor) {
         this.textColor = textColor;
+    }
+
+    public enum ViewType {
+        DEFAULT, UNDERLINE, BIASLINE
+    }
+
+    private class PaintLastArcAnim extends Animation {
+        @Override
+        protected void applyTransformation(float time, Transformation t) {
+            super.applyTransformation(time, t);
+//            radiusArc_last = radiusArc * interpolatedTime;
+            interpolatedTime = time;
+            postInvalidate();
+
+
+        }
     }
 
 

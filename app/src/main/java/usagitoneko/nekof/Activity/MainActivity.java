@@ -4,12 +4,9 @@ package usagitoneko.nekof.Activity;
 
 import android.app.Activity;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -23,7 +20,6 @@ import android.nfc.tech.NfcV;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -65,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
     private PwdInputView password;
     private Switch showPwSwitch;
     private FancyButton submitBut;
+
 
     /**
      * @param activity The corresponding {@link Activity} requesting the foreground dispatch.
@@ -139,7 +136,6 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
         switch (v.getId()){
             case R.id.showPwSwitch:
                 password.setShadowPasswords(showPwSwitch.isChecked());
-
                 break;
             case R.id.submitPassword:
                 int passwordINT = Integer.valueOf(password.getText().toString());
@@ -338,10 +334,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
 
             WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
 
-            if( wifiInfo.getNetworkId() == -1 ){
-                return false; // Not connected to an access point
-            }
-            return true; // Connected to an access point
+            return wifiInfo.getNetworkId() != -1;
         }
         else {
             return false; // Wi-Fi adapter is OFF

@@ -31,7 +31,13 @@ import usagitoneko.nekof.Widget.Croller;
  */
 public class MainFragment extends Fragment implements Loading_dialog.Callbacks, OnClickListener {
 
+    public final int WRITE_PERMISSION = 0;
+    public final int LED2 =1;
+    public final int LED_GREEN =2;
+    public final int LED_BLUE = 3;
+    public final int LED_ORANGE = 4;
     protected View mView;
+    onSomeEventListener someEventListener;
     private JellyToggleButton led2;
     private JellyToggleButton ledBlue;
     private JellyToggleButton ledGreen;
@@ -42,25 +48,16 @@ public class MainFragment extends Fragment implements Loading_dialog.Callbacks, 
     private TextView knobTemperatureText;
     private boolean[] allBool =new boolean[5];
     private List<Boolean> allLedStatus = new ArrayList<>();
-    public final int WRITE_PERMISSION = 0;
-    public final int LED2 =1;
-    public final int LED_GREEN =2;
-    public final int LED_BLUE = 3;
-    public final int LED_ORANGE = 4;
     private boolean firstClick;
 
     public MainFragment() {
         // Required empty public constructor
     }
 
-    public interface onSomeEventListener{
-        public void someEvent(List<Boolean> allLedStatus);
-    }
-    onSomeEventListener someEventListener;
-
     public void dummy(){
         Toast.makeText(getActivity(), "toast!!!", Toast.LENGTH_SHORT).show();
     }
+
     @Override
     public void getWriteStatus(boolean writeStatus) {
         allBool[4] = writeStatus;
@@ -225,6 +222,10 @@ public class MainFragment extends Fragment implements Loading_dialog.Callbacks, 
         croller.setProgressSecondaryColor(Color.parseColor("#EEEEEE"));
         croller.setIndicatorWidth(10);
         return croller;
+    }
+
+    public interface onSomeEventListener{
+        void someEvent(List<Boolean> allLedStatus);
     }
 
 

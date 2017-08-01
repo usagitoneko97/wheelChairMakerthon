@@ -8,9 +8,6 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
-/**
- * Created by user on 8/1/2017.
- */
 
 public class WifiReceiver extends BroadcastReceiver{
     @Override

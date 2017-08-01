@@ -16,9 +16,6 @@ import usagitoneko.nekof.R;
 
 public class Loading_dialog extends android.support.v4.app.DialogFragment {
 
-    public static interface Callbacks {
-        void getWriteStatus(boolean writeStatus);
-    }
     Callbacks callbacks;
 
     @Override
@@ -44,7 +41,6 @@ public class Loading_dialog extends android.support.v4.app.DialogFragment {
         callbacks = null;
     }
 
-
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         return new MaterialDialog.Builder(getContext()).customView(R.layout.loading_dialog, true).
@@ -57,12 +53,16 @@ public class Loading_dialog extends android.support.v4.app.DialogFragment {
                 }).show();
 
     }
-    //change the password
-
 
     @Override
     public void onPause() {
         super.onPause();
         this.dismiss();
+    }
+    //change the password
+
+
+    public interface Callbacks {
+        void getWriteStatus(boolean writeStatus);
     }
 }

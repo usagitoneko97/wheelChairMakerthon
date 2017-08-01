@@ -15,6 +15,16 @@ public class LedState {
     private boolean GreenLedState;
     private boolean BlueLedState;
     private boolean OrangeLedState;
+    private TextView nfc_result;
+    private TextView log;
+    private int ledStatus;
+
+    public LedState(TextView nfc_result,TextView log, int ledStatus){
+        this.nfc_result = nfc_result;
+        this.ledStatus = ledStatus;
+        this.log = log;
+        nfc_result.setText(""); //to clear the status of led every newIntent come
+    }
 
     public boolean isLed2State() {
         return isLed(LED2);
@@ -48,22 +58,8 @@ public class LedState {
         OrangeLedState = orangeLedState;
     }
 
-    private TextView nfc_result;
-    private TextView log;
-    private int ledStatus;
-    public LedState(TextView nfc_result,TextView log, int ledStatus){
-        this.nfc_result = nfc_result;
-        this.ledStatus = ledStatus;
-        this.log = log;
-        nfc_result.setText(""); //to clear the status of led every newIntent come
-    }
-
     public boolean isLed(int led_colour){
-        if((led_colour &ledStatus)!=0 )
-        {
-            return true;
-        }
-        return false;
+        return (led_colour & ledStatus) != 0;
 
     }
     public String getName(int ledColour){
