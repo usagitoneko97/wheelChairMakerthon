@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.Image;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentManager;
@@ -128,9 +129,13 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
 
                 offset *= mSeekbarProgress[0]/100.00000;
                 offset*=10;
-                sendCommand("body",offset, Math.round(finalDegrees));
-                Log.v("angle", String.valueOf(Math.round(finalDegrees)));
-                Log.v("radius", String.valueOf(Math.round(offset)));
+                final float offsetFinal = offset;
+                final float degreesFinal = degrees;
+
+                sendCommand("body",offsetFinal, Math.round(degreesFinal));
+
+                Log.v("espcommand", String.valueOf(Math.round(degreesFinal)));
+                Log.v("espcommand", String.valueOf(offsetFinal));
             }
 
             @Override
