@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:fancy="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    xmlns:fancy="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@mipmap/woodbackground">
+    android:background="@mipmap/woodbackground"
+    android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/my_toolbar"
@@ -22,10 +22,10 @@
         android:layout_height="50dp"
         android:layout_above="@+id/showPwSwitch"
         android:layout_centerHorizontal="true"
-        android:ems="10"
-        android:hint="enter your password"
         android:cursorVisible="false"
+        android:ems="10"
         android:focusableInTouchMode="true"
+        android:hint="enter your password"
         android:inputType="number"
         android:lines="1"
         android:maxLength="4"/>
@@ -35,12 +35,12 @@
         android:id="@+id/submitPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/showPwSwitch"
+        android:layout_centerHorizontal="true"
         android:paddingBottom="10dp"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         android:paddingTop="10dp"
-        android:layout_below="@+id/showPwSwitch"
-        android:layout_centerHorizontal="true"
         fancy:fb_borderColor="#FFFFFF"
         fancy:fb_borderWidth="0dp"
         fancy:fb_defaultColor="#795548"
@@ -55,8 +55,17 @@
         android:id="@+id/showPwSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="9dp"
-        android:text="Show Password"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"/>
+        android:layout_centerVertical="true"
+        android:layout_marginTop="9dp"
+        android:text="Show Password"/>
+
+    <TextView
+        android:id="@+id/testForIntent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/submitPassword"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="87dp"
+        android:text="TextView" />
 </RelativeLayout>

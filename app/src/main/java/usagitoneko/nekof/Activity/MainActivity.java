@@ -34,6 +34,9 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import com.google.common.primitives.Bytes;
 import com.kosalgeek.asynctask.AsyncResponse;
+
+import org.w3c.dom.Text;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -61,6 +64,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
     private PwdInputView password;
     private Switch showPwSwitch;
     private FancyButton submitBut;
+
+    private TextView testForIntent;
 
 
     /**
@@ -108,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
 
         showPwSwitch = (Switch) findViewById(R.id.showPwSwitch);
         submitBut = (FancyButton) findViewById(R.id.submitPassword);
+        testForIntent = (TextView)findViewById(R.id.testForIntent);
         submitBut.setOnClickListener(this);
         password.setShadowPasswords(showPwSwitch.isChecked());
         password.setPwdInputViewType(PwdInputView.ViewType.DEFAULT);
@@ -136,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
         switch (v.getId()){
             case R.id.showPwSwitch:
                 password.setShadowPasswords(showPwSwitch.isChecked());
+                testForIntent.setText("success!");
                 break;
             case R.id.submitPassword:
                 int passwordINT = Integer.valueOf(password.getText().toString());
@@ -317,6 +324,11 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
                 }
             }
         }
+        else if(intent.getAction().equals(NfcAdapter.ACTION_NDEF_DISCOVERED)){
+            Toast.makeText(this, "Ndef intent launched!!", Toast.LENGTH_SHORT).show();
+            testForIntent.setText("success!");
+            Log.v("nfcIntent", "success!!");
+        }
         else {  //has NDEF inside the tag
             handleIntent(intent); //read data on the tag and display to the textview
             if (isNfcIntent(intent)) {
@@ -479,6 +491,10 @@ public class MainActivity extends AppCompatActivity implements MainFragment.onSo
             result +=bytes[i];
         }
         return result;
+    }
+
+    public int add(int v1, int v2){
+        return v1 + v2;
     }
 
     public String numberToHex(int value) {
