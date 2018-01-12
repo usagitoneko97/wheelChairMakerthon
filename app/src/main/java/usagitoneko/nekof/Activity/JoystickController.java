@@ -117,25 +117,18 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
             @Override
             public void onDrag(float degrees, float offset) {
                 // ..
-                float finalDegrees;
 
-                if(degrees<0){
-                    finalDegrees = degrees + 360;
-
+                float finalDegrees = 90 - degrees;
+                if(finalDegrees < 0){
+                    finalDegrees += 360;
                 }
-                else {
-                    finalDegrees = degrees;
-                }
-
                 offset *= mSeekbarProgress[0]/100.00000;
-                offset*=10;
+                offset *= 100;
                 final float offsetFinal = offset;
-                final float degreesFinal = degrees;
+                Log.v("degrees", String.valueOf(finalDegrees));
+                Log.v("offset", String.valueOf(offsetFinal));
 
-                sendCommand("body",offsetFinal, Math.round(degreesFinal));
-
-                Log.v("espcommand", String.valueOf(Math.round(degreesFinal)));
-                Log.v("espcommand", String.valueOf(offsetFinal));
+                sendCommand("body",offsetFinal, Math.round(finalDegrees));
             }
 
             @Override
