@@ -43,12 +43,14 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
     private static final String FORCESTOP = "forcestop";
     private static final String MOVE = "body";
     final int[] mSeekbarProgress = new int[1];
+    final int[] mAccelerationProgress = new int[1];
     View lineIndicator;
     int[] location = new int[2];
     SharedPreferences settingsPreference;
     private FancyButton uTurnButton;
     private FancyButton forceStopButton;
     private BubbleSeekBar speedSeekbar;
+    private BubbleSeekBar accelerationSeekbar;
     private ImageView torchLight;
     private boolean firstTimePassword;
 
@@ -57,6 +59,7 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
         super.onCreate(savedInstanceState);
         setContentView(R.layout.joystick_wrapper);
         mSeekbarProgress[0] = 100;
+        mAccelerationProgress[0] = 100;
         Toolbar myToolbar = (Toolbar) findViewById(R.id.joystickToolbar);
         setSupportActionBar(myToolbar);
         settingsPreference = PreferenceManager.getDefaultSharedPreferences(this);
@@ -80,8 +83,7 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
         uTurnButton = (FancyButton)findViewById(R.id.uTurnButton);
         forceStopButton = (FancyButton)findViewById(R.id.forceStopButton);
         speedSeekbar = (BubbleSeekBar) findViewById(R.id.speedSeekbar);
-        torchLight = (ImageView) findViewById(R.id.torchLight);
-        torchLight.setOnClickListener(this);
+        accelerationSeekbar = (BubbleSeekBar) findViewById(R.id.accelerationSeekBar);
         uTurnButton.setOnClickListener(this);
         forceStopButton.setOnClickListener(this);
 
@@ -97,6 +99,23 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
             @Override
             public void getProgressOnActionUp(int progress, float progressFloat) {
                 mSeekbarProgress[0] = progress;
+            }
+
+            @Override
+            public void getProgressOnFinally(int progress, float progressFloat) {
+
+            }
+        });
+
+        accelerationSeekbar.setOnProgressChangedListener(new BubbleSeekBar.OnProgressChangedListener() {
+            @Override
+            public void onProgressChanged(int progress, float progressFloat) {
+
+            }
+
+            @Override
+            public void getProgressOnActionUp(int progress, float progressFloat) {
+                mAccelerationProgress[0] = progress;
             }
 
             @Override
@@ -128,16 +147,14 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
                 Log.v("degrees", String.valueOf(finalDegrees));
                 Log.v("offset", String.valueOf(offsetFinal));
 
-                sendCommand("body",offsetFinal, Math.round(finalDegrees));
+                sendCommand("body",offsetFinal, Math.round(finalDegrees), mAccelerationProgress[0]);
             }
 
             @Override
             public void onUp() {
                 lineIndicator.setLayoutParams(new ConstraintLayout.LayoutParams(1,1 ));
 
-                sendCommand(MOVE, 0, 0);
-                // TODO: 4/13/2017 slowly decrease to zero
-                // ..
+                sendCommand(MOVE, 0, 0, mAccelerationProgress[0]);
             }
         });
 
@@ -157,13 +174,10 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.uTurnButton:
-                sendCommand(UTURN, 0,0);
+                sendCommand(UTURN, 0,0, mAccelerationProgress[0]);
                 break;
             case R.id.forceStopButton:
-                sendCommand(FORCESTOP,0,0);
-            case R.id.torchLight:
-                Toast.makeText(this, "torchlight!!", Toast.LENGTH_SHORT).show();
-                break;
+                sendCommand(FORCESTOP,0,0, mAccelerationProgress[0]);
         }
     }
 
@@ -200,9 +214,7 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
         return super.onOptionsItemSelected(item);
     }
 
-    private boolean sendCommand (final String operation, final float offset, final float degrees){
-        // TODO: 3/28/2017 send degrees and offset as json object
-
+    private boolean sendCommand (final String operation, final float offset, final float degrees, final int acceleration){
         StringBuilder uRLBuilder = new StringBuilder();
         uRLBuilder.append("http://192.168.4.1/");
         uRLBuilder.append(operation);
@@ -233,10 +245,9 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
                         try {
                             jsonObject.put("offset", offset);
                             jsonObject.put("degrees", degrees);
+                            jsonObject.put("acceleration", acceleration);
 
                             body = jsonObject.toString();
-
-
 
                             return body.toString().getBytes("utf-8");
                         } catch (UnsupportedEncodingException e) {
