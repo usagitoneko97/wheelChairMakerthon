@@ -155,6 +155,10 @@ public class JoystickController extends AppCompatActivity implements View.OnClic
                 lineIndicator.setLayoutParams(new ConstraintLayout.LayoutParams(1,1 ));
 
                 sendCommand(MOVE, 0, 0, mAccelerationProgress[0]);
+                sendCommand(MOVE, 0, 0, mAccelerationProgress[0]);
+                sendCommand(MOVE, 0, 0, mAccelerationProgress[0]);
+                sendCommand(MOVE, 0, 0, mAccelerationProgress[0]);
+                sendCommand(MOVE, 0, 0, mAccelerationProgress[0]);
             }
         });
 

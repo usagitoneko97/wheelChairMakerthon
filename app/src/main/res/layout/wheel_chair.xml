@@ -66,6 +66,5 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/submitPassword"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="87dp"
-        android:text="TextView" />
+        android:layout_marginTop="87dp" />
 </RelativeLayout>
